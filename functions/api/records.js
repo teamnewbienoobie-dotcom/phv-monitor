@@ -17,8 +17,25 @@ export async function onRequest(context) {
     const url = new URL(request.url);
     const name = url.searchParams.get('name')?.trim();
 
+    // 沒有 name → 回傳所有運動員摘要
     if (!name) {
-      return Response.json([]);
+      try {
+        const { results } = await env.DB.prepare(
+          `SELECT name,
+                  COUNT(*) as count,
+                  MAX(date) as last_date,
+                  (SELECT stage FROM phv_records p2
+                   WHERE p2.name = p1.name
+                   ORDER BY date DESC LIMIT 1) as last_stage
+           FROM phv_records p1
+           GROUP BY name
+           ORDER BY last_date DESC`
+        ).all();
+        return Response.json(results);
+      } catch (err) {
+        console.error('GET all error:', err);
+        return Response.json({ error: 'database error' }, { status: 500 });
+      }
     }
 
     try {

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHV Monitor — 後台管理</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0a0f1e;
+  color: #e0e0f0;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+h1 {
+  font-size: 1.2rem;
+  color: #00e5ff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.subtitle {
+  font-size: .8rem;
+  color: #556;
+  margin-bottom: 28px;
+}
+.loading {
+  color: #556;
+  font-size: .9rem;
+  text-align: center;
+  padding: 40px;
+}
+.athlete-card {
+  background: #111827;
+  border: 1px solid #1e2d4a;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.athlete-card:hover { border-color: #00e5ff44; }
+.athlete-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.athlete-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e0e0f0;
+}
+.athlete-meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.badge {
+  font-size: .72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.badge-pre  { background: #1a3a5c; color: #60b0ff; }
+.badge-peak { background: #3a1a5c; color: #c060ff; }
+.badge-post { background: #1a5c2a; color: #60ff90; }
+.badge-unknown { background: #2a2a2a; color: #888; }
+.count-label {
+  font-size: .75rem;
+  color: #445;
+}
+.last-date {
+  font-size: .75rem;
+  color: #445;
+}
+.chevron {
+  color: #334;
+  font-size: .9rem;
+  transition: transform .2s;
+}
+.athlete-card.open .chevron { transform: rotate(90deg); }
+.athlete-body {
+  display: none;
+  border-top: 1px solid #1e2d4a;
+  overflow-x: auto;
+}
+.athlete-card.open .athlete-body { display: block; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+thead tr { background: #0d1525; }
+th {
+  padding: 10px 16px;
+  text-align: left;
+  color: #445;
+  font-weight: 600;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+td {
+  padding: 10px 16px;
+  border-top: 1px solid #1a2235;
+  color: #bbc;
+  white-space: nowrap;
+}
+.mo-val { font-weight: 700; }
+.mo-neg { color: #60b0ff; }
+.mo-pos { color: #c060ff; }
+.stage-pre  { color: #60b0ff; }
+.stage-peak { color: #c060ff; }
+.stage-post { color: #60ff90; }
+.empty {
+  text-align: center;
+  color: #334;
+  font-size: .85rem;
+  padding: 40px;
+}
+.summary-bar {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.stat {
+  background: #111827;
+  border: 1px solid #1e2d4a;
+  border-radius: 8px;
+  padding: 12px 20px;
+  min-width: 120px;
+}
+.stat-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #00e5ff;
+  line-height: 1;
+}
+.stat-label {
+  font-size: .72rem;
+  color: #445;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<h1>PHV Monitor — 後台管理</h1>
+<p class="subtitle">所有運動員資料總覽</p>
+
+<div class="summary-bar" id="summaryBar"></div>
+<div id="list"><div class="loading">載入中…</div></div>
+
+<script>
+const STAGE_LABEL = { pre: '發育前期', peak: '接近 PHV', post: '發育後期' };
+const STAGE_CLS   = { pre: 'pre', peak: 'peak', post: 'post' };
+
+async function load() {
+  const res = await fetch('/api/records');
+  const athletes = await res.json();
+
+  const bar = document.getElementById('summaryBar');
+  const totalRecords = athletes.reduce((s, a) => s + a.count, 0);
+  bar.innerHTML = `
+    <div class="stat"><div class="stat-num">${athletes.length}</div><div class="stat-label">運動員人數</div></div>
+    <div class="stat"><div class="stat-num">${totalRecords}</div><div class="stat-label">總測量次數</div></div>
+  `;
+
+  const list = document.getElementById('list');
+  if (!athletes.length) {
+    list.innerHTML = '<div class="empty">尚無資料</div>';
+    return;
+  }
+
+  list.innerHTML = athletes.map(a => {
+    const cls = STAGE_CLS[a.last_stage] || 'unknown';
+    const label = STAGE_LABEL[a.last_stage] || a.last_stage || '—';
+    return `
+      <div class="athlete-card" id="card-${encodeURIComponent(a.name)}">
+        <div class="athlete-hd" onclick="toggle('${escAttr(a.name)}')">
+          <div class="athlete-name">${esc(a.name)}</div>
+          <div class="athlete-meta">
+            <span class="last-date">最近：${a.last_date || '—'}</span>
+            <span class="count-label">${a.count} 筆</span>
+            <span class="badge badge-${cls}">${label}</span>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="athlete-body" id="body-${encodeURIComponent(a.name)}">
+          <div class="loading">載入中…</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function toggle(name) {
+  const card = document.getElementById('card-' + encodeURIComponent(name));
+  const body = document.getElementById('body-' + encodeURIComponent(name));
+  const isOpen = card.classList.contains('open');
+  if (isOpen) { card.classList.remove('open'); return; }
+  card.classList.add('open');
+  if (body.dataset.loaded) return;
+  body.dataset.loaded = '1';
+  const res = await fetch('/api/records?name=' + encodeURIComponent(name));
+  const records = await res.json();
+  if (!records.length) { body.innerHTML = '<div class="empty">無歷史紀錄</div>'; return; }
+  body.innerHTML = `
+    <table>
+      <thead><tr><th>日期</th><th>MO 偏移</th><th>身高 (cm)</th><th>發育階段</th></tr></thead>
+      <tbody>
+        ${records.map(r => {
+          const mo = Number(r.mo).toFixed(1);
+          const moCls = r.mo < 0 ? 'mo-neg' : 'mo-pos';
+          const moStr = r.mo >= 0 ? '+' + mo : mo;
+          const stCls = 'stage-' + (STAGE_CLS[r.stage] || 'pre');
+          const stLabel = STAGE_LABEL[r.stage] || r.stage;
+          return `<tr>
+            <td>${r.date}</td>
+            <td><span class="mo-val ${moCls}">${moStr}</span></td>
+            <td>${Number(r.height).toFixed(1)}</td>
+            <td class="${stCls}">${stLabel}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(s) {
+  return String(s).replace(/'/g,"\\'");
+}
+
+load();
+</script>
+</body>
+</html>
