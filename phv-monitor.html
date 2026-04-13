@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHV 發育監控系統 — 青少年運動員</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #060d18;
+  --bg-s:     #0b1827;
+  --bg-c:     #0e2035;
+  --border:   rgba(0,210,255,.13);
+  --border-b: rgba(0,210,255,.40);
+  --cyan:     #00d2ff;
+  --cyan-d:   rgba(0,210,255,.55);
+  --amber:    #ffb347;
+  --green:    #00ff99;
+  --purple:   #a47fff;
+  --red:      #ff4d6d;
+  --t1:       #deeefa;
+  --t2:       #7aaabf;
+  --t3:       #3d667f;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family:'Noto Sans TC',sans-serif;
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,100,200,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 85%,rgba(0,60,160,.05) 0%,transparent 70%),
+    linear-gradient(rgba(0,210,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,210,255,.025) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,44px 44px,44px 44px;
+  min-height:100vh;
+  color:var(--t1);
+  padding-bottom:80px;
+}
+
+/* ── HEADER ── */
+header{text-align:center;padding:56px 20px 44px;position:relative}
+header::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:240px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:2.5px;color:var(--cyan);border:1px solid var(--border-b);padding:5px 14px;border-radius:2px;margin-bottom:22px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+h1{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.15;background:linear-gradient(145deg,#fff 10%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px}
+.header-sub{color:var(--t2);font-size:.9rem;line-height:1.7;max-width:560px;margin:0 auto;font-weight:300}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px;display:grid;gap:22px}
+
+/* ── CARD ── */
+.card{background:var(--bg-c);border:1px solid var(--border);border-radius:14px;padding:30px 32px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--cyan-d) 50%,transparent 95%)}
+.card-title{font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:26px;display:flex;align-items:center;gap:12px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── GENDER ── */
+.gender-wrap{margin-bottom:22px}
+.gender-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:block}
+.gender-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g-btn{padding:13px;border-radius:8px;background:rgba(0,0,0,.35);border:1px solid rgba(0,210,255,.18);color:var(--t2);font-family:'Noto Sans TC',sans-serif;font-size:1rem;cursor:pointer;transition:all .25s;text-align:center}
+.g-btn:hover{border-color:rgba(0,210,255,.35);color:var(--t1)}
+.g-btn.on-male{background:rgba(0,140,255,.18);border-color:#3ab0ff;color:#7fd4ff}
+.g-btn.on-female{background:rgba(255,100,140,.18);border-color:#ff7aaa;color:#ffaac8}
+
+/* ── INPUTS ── */
+.inp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:18px}
+.inp-group{display:flex;flex-direction:column;gap:8px}
+.inp-group label{font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase}
+.inp-group label span{color:var(--t3);font-size:.6rem}
+input[type=number]{width:100%;background:rgba(0,0,0,.42);border:1px solid rgba(0,210,255,.2);border-radius:7px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:1.12rem;padding:14px 15px;outline:none;transition:border-color .2s,box-shadow .2s;-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,210,255,.1)}
+input[type=number]::placeholder{color:var(--t3)}
+
+/* ── BUTTON ── */
+.calc-btn{margin-top:20px;width:100%;padding:17px;border-radius:9px;background:linear-gradient(135deg,#054d70 0%,#0778a8 100%);border:1px solid var(--cyan);color:#fff;font-family:'Orbitron',sans-serif;font-size:.85rem;letter-spacing:4px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,box-shadow .25s}
+.calc-btn:hover{transform:translateY(-2px);box-shadow:0 0 32px rgba(0,210,255,.28)}
+.calc-btn::after{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transition:left .55s}
+.calc-btn:hover::after{left:160%}
+.err-msg{background:rgba(255,70,100,.1);border:1px solid rgba(255,70,100,.3);border-radius:6px;padding:11px 15px;color:#ff8a96;font-size:.85rem;margin-top:14px;display:none}
+
+/* ── RESULTS ── */
+.results{display:none}
+.results.on{display:grid;gap:22px;animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.met{background:rgba(0,0,0,.32);border:1px solid var(--border);border-radius:9px;padding:18px 14px;text-align:center}
+.met-lbl{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.met-val{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:700;line-height:1}
+.met-unit{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--t2);margin-top:5px}
+
+/* ── GAUGE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center}
+.gauge-inner{width:100%;max-width:680px}
+.mo-scale{display:flex;justify-content:space-between;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);padding:0 2px}
+.strip{height:52px;border-radius:26px;background:linear-gradient(90deg,#1a4f7a 0%,#1d6fa0 15%,#18957a 30%,#d9a020 42%,#e05a20 50%,#c02840 62%,#7a30b0 78%,#4a1878 100%);position:relative;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+.strip-needle{position:absolute;top:0;bottom:0;width:3px;background:#fff;border-radius:2px;box-shadow:0 0 12px #fff,0 0 28px rgba(255,255,255,.45);transition:left 1s cubic-bezier(.34,1.56,.64,1)}
+.strip-needle::after{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-top:9px solid #fff}
+.zone-labels{display:flex;justify-content:space-between;margin-top:18px;font-size:.73rem;font-weight:500}
+.zone-lbl-pre{color:#60c0f0}
+.zone-lbl-phv{color:var(--amber)}
+.zone-lbl-post{color:var(--purple)}
+
+/* ── STAGE CARD ── */
+.stage-card{margin-top:22px;border-radius:12px;padding:24px 28px;border:1px solid;display:flex;align-items:center;gap:20px;transition:all .4s;width:100%;max-width:680px}
+.stage-card.pre{background:rgba(0,100,200,.12);border-color:rgba(80,180,255,.28)}
+.stage-card.peak{background:rgba(220,110,20,.12);border-color:rgba(255,160,60,.35)}
+.stage-card.post{background:rgba(130,60,200,.12);border-color:rgba(170,110,255,.3)}
+.stage-emoji{font-size:2.8rem;flex-shrink:0;line-height:1}
+.stage-text-wrap{flex:1}
+.stage-name{font-family:'Orbitron',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:7px}
+.stage-card.pre  .stage-name{color:#60c8ff}
+.stage-card.peak .stage-name{color:var(--amber)}
+.stage-card.post .stage-name{color:var(--purple)}
+.stage-desc{font-size:.87rem;color:var(--t2);line-height:1.7}
+
+/* ═══════════════════════════════
+   TANNER CHECKLIST (NEW)
+═══════════════════════════════ */
+.tanner-inst{background:rgba(0,210,255,.06);border:1px solid rgba(0,210,255,.18);border-radius:9px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;font-size:.87rem;color:var(--t2);line-height:1.65;margin-bottom:24px}
+.tanner-inst-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px}
+
+.t-group{margin-bottom:22px}
+.t-group:last-child{margin-bottom:0}
+.t-group-title{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.t-group-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.t-check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:7px;cursor:pointer;transition:background .2s,border-color .2s;margin-bottom:5px;border:1px solid transparent;user-select:none}
+.t-check-item:hover{background:rgba(0,210,255,.06);border-color:var(--border)}
+.t-check-item.checked{background:rgba(0,210,255,.1);border-color:rgba(0,210,255,.28)}
+
+.t-check-box{width:18px;height:18px;border:2px solid var(--t3);border-radius:4px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.8rem;color:transparent;line-height:1}
+.t-check-item.checked .t-check-box{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:700}
+
+.t-check-label{font-size:.85rem;color:var(--t2);line-height:1.55;flex:1}
+.t-check-item.checked .t-check-label{color:var(--t1)}
+
+.t-stage-badge{font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:4px;letter-spacing:.5px}
+.bs2{background:rgba(80,180,255,.18);color:#60c8ff}
+.bs3{background:rgba(255,180,50,.18);color:#ffcc70}
+.bs4{background:rgba(200,80,60,.18);color:#ff9080}
+.bs5{background:rgba(160,80,255,.18);color:#c090ff}
+
+/* Tanner estimation display */
+.tanner-estimate{display:flex;align-items:center;gap:16px;padding:16px 18px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:9px;margin-top:20px}
+.te-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.te-stage{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:700;color:var(--t1);line-height:1}
+.te-phase{font-size:.8rem;color:var(--t2);margin-top:4px}
+.te-divider{width:1px;height:48px;background:var(--border);flex-shrink:0}
+.te-note{font-size:.8rem;color:var(--t3);line-height:1.55;flex:1}
+.te-prompt{font-size:.82rem;color:var(--t3);font-style:italic;padding:16px 18px;text-align:center}
+
+/* ── CROSS-VALIDATION PANEL ── */
+.crossval{margin-top:20px;border-radius:10px;overflow:hidden;border:1px solid;animation:fadeUp .4s ease}
+.crossval.match-ok   {border-color:rgba(0,255,150,.3)}
+.crossval.match-warn {border-color:rgba(255,180,50,.35)}
+.crossval.match-bad  {border-color:rgba(255,70,100,.35)}
+
+.cv-top{display:grid;grid-template-columns:1fr 44px 1fr}
+.cv-col{padding:18px 20px;background:rgba(0,0,0,.28)}
+.cv-col:first-child{border-right:1px solid var(--border)}
+.cv-vs{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);letter-spacing:1px;writing-mode:horizontal-tb}
+.cv-method{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.cv-stage-val{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;line-height:1;margin-bottom:5px}
+.cv-phase-val{font-size:.78rem;color:var(--t2)}
+
+.cv-bottom{padding:15px 20px;display:flex;align-items:center;gap:14px;border-top:1px solid rgba(255,255,255,.06)}
+.crossval.match-ok   .cv-bottom{background:rgba(0,255,150,.05)}
+.crossval.match-warn .cv-bottom{background:rgba(255,180,50,.05)}
+.crossval.match-bad  .cv-bottom{background:rgba(255,70,100,.05)}
+.cv-icon{font-size:1.6rem;flex-shrink:0}
+.cv-text{font-size:.85rem;line-height:1.65;flex:1;color:var(--t2)}
+.cv-text strong{color:var(--t1)}
+
+/* ── RECS ── */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}
+.rec-item{background:rgba(0,0,0,.28);border-radius:9px;padding:17px 15px;border-left:3px solid}
+.rec-item.do   {border-color:var(--green)}
+.rec-item.warn {border-color:var(--amber)}
+.rec-item.avoid{border-color:var(--red)}
+.rec-lbl{font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.rec-item.do    .rec-lbl{color:var(--green)}
+.rec-item.warn  .rec-lbl{color:var(--amber)}
+.rec-item.avoid .rec-lbl{color:var(--red)}
+.rec-body{font-size:.83rem;color:var(--t2);line-height:1.65}
+
+/* ── WARN BOX ── */
+.warn-box{margin-top:18px;background:rgba(255,160,50,.07);border:1px solid rgba(255,160,50,.22);border-radius:8px;padding:13px 17px;display:flex;gap:12px;align-items:flex-start;font-size:.82rem;color:rgba(255,195,100,.8);line-height:1.65}
+.warn-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+
+/* ── FORMULA CHIP ── */
+.formula-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--t3);margin-top:18px}
+
+/* ── MOBILE ── */
+@media(max-width:540px){
+  .card{padding:22px 18px}
+  .stage-card{flex-direction:column;text-align:center;gap:12px}
+  .cv-top{grid-template-columns:1fr 32px 1fr}
+  .cv-col{padding:14px 12px}
+  .cv-stage-val{font-size:1.2rem}
+}
+
+/* ── HISTORY PANEL ── */
+.history-wrap{background:rgba(0,210,255,.04);border:1px solid rgba(0,210,255,.15);border-radius:8px;padding:14px 16px;margin-bottom:18px}
+.history-hd{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;padding:5px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.history-table td{padding:7px 8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--t2);border-bottom:1px solid rgba(0,0,0,.2)}
+.history-table tr:last-child td{border-bottom:none}
+.history-empty{color:var(--t3);font-size:.82rem;font-style:italic}
+.history-loading{color:var(--t3);font-size:.8rem}
+.history-error{color:var(--red);font-size:.8rem}
+.inp-name{width:100%;background:rgba(0,0,0,.42);border:1px solid rgba(0,210,255,.2);border-radius:7px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:1.12rem;padding:14px 15px;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp-name:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,210,255,.1)}
+.inp-name::placeholder{color:var(--t3)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge"><span class="badge-dot"></span>MIRWALD PROTOCOL 2002 · YOUTH ATHLETE DEVELOPMENT SYSTEM</div>
+  <h1>PHV 發育監控系統</h1>
+  <p class="header-sub">輸入身體測量數值，透過 Mirwald 公式計算成熟偏移值 (Maturity Offset)，<br>再由家長自選外觀特徵推估 Tanner Stage，交叉驗證兩種評估的一致性。</p>
+</header>
+
+<div class="wrap">
+
+  <!-- ── STEP 1: INPUT ── -->
+  <div class="card">
+    <div class="card-title">Step 1 &nbsp;—&nbsp; 輸入測量資料</div>
+
+    <div class="inp-group" style="margin-bottom:22px">
+      <label class="inp-group" style="font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:block">運動員姓名 <span style="color:var(--t3);font-size:.6rem">（輸入後自動載入歷史紀錄）</span></label>
+      <input type="text" id="athleteName" class="inp-name" placeholder="例：小明"
+             onblur="lookupHistory(this.value.trim())">
+    </div>
+    <div id="historyPanel"></div>
+
+    <div class="gender-wrap">
+      <span class="gender-label">生理性別</span>
+      <div class="gender-btns">
+        <button class="g-btn on-male"  onclick="setGender('male',this)">♂&ensp;男生</button>
+        <button class="g-btn"          onclick="setGender('female',this)">♀&ensp;女生</button>
+      </div>
+    </div>
+
+    <div class="inp-grid">
+      <div class="inp-group">
+        <label>年齡 <span>（歲，小數可輸入 例：10.5）</span></label>
+        <input type="number" id="age" placeholder="10.5" step="0.1" min="6" max="18">
+      </div>
+      <div class="inp-group">
+        <label>站立身高 <span>（cm）</span></label>
+        <input type="number" id="height" placeholder="145.0" step="0.1" min="80" max="220">
+      </div>
+      <div class="inp-group">
+        <label>坐高（坐姿頭頂到椅面）<span>（cm）</span></label>
+        <input type="number" id="sitH" placeholder="77.5" step="0.1" min="40" max="130">
+      </div>
+      <div class="inp-group">
+        <label>體重 <span>（kg）</span></label>
+        <input type="number" id="weight" placeholder="38.0" step="0.1" min="10" max="150">
+      </div>
+    </div>
+
+    <div class="err-msg" id="errMsg"></div>
+    <button class="calc-btn" onclick="run()">ANALYZE &nbsp;·&nbsp; 開始評估</button>
+    <div style="text-align:center">
+      <div class="formula-chip">📐 Mirwald et al., 2002 · Med Sci Sports Exerc 34(4):689–694</div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div class="results" id="results">
+
+    <!-- Metrics -->
+    <div class="card">
+      <div class="card-title">Mirwald 測量分析</div>
+      <div class="metrics">
+        <div class="met"><div class="met-lbl">腿長 (LL)</div><div class="met-val" id="mLL" style="color:var(--cyan)">—</div><div class="met-unit">cm</div></div>
+        <div class="met"><div class="met-lbl">坐高比</div><div class="met-val" id="mSR" style="color:var(--cyan)">—</div><div class="met-unit">%</div></div>
+        <div class="met"><div class="met-lbl">成熟偏移值</div><div class="met-val" id="mMO" style="color:var(--amber)">—</div><div class="met-unit">Maturity Offset</div></div>
+        <div class="met"><div class="met-lbl">預測 PHV 年齡</div><div class="met-val" id="mPA" style="color:var(--green)">—</div><div class="met-unit">歲</div></div>
+        <div class="met"><div class="met-lbl">距 PHV</div><div class="met-val" id="mDist" style="color:var(--purple)">—</div><div class="met-unit">年</div></div>
+      </div>
+    </div>
+
+    <!-- Gauge -->
+    <div class="card">
+      <div class="card-title">發育階段量表</div>
+      <div class="gauge-wrap">
+        <div class="gauge-inner">
+          <div class="mo-scale">
+            <span>MO −4</span><span>−3</span><span>−2</span><span>−1</span>
+            <span style="color:var(--amber);font-weight:600">0 PHV</span>
+            <span>+1</span><span>+2</span><span>+3</span><span>+4</span>
+          </div>
+          <div class="strip"><div class="strip-needle" id="needle"></div></div>
+          <div class="zone-labels">
+            <span class="zone-lbl-pre">◀ 發育前期</span>
+            <span class="zone-lbl-phv">⚡ PHV 高峰</span>
+            <span class="zone-lbl-post">發育後期 ▶</span>
+          </div>
+        </div>
+        <div class="stage-card" id="stageCard">
+          <div class="stage-emoji" id="sEmoji"></div>
+          <div class="stage-text-wrap">
+            <div class="stage-name" id="sName"></div>
+            <div class="stage-desc" id="sDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TANNER CHECKLIST (STEP 2) ═══ -->
+    <div class="card">
+      <div class="card-title">Step 2 &nbsp;—&nbsp; Tanner Stage 外觀特徵自評</div>
+
+      <div class="tanner-inst">
+        <span class="tanner-inst-icon">🔍</span>
+        <div>根據孩子目前的外觀，<strong>勾選所有符合的描述</strong>（可複選）。系統將自動推估 Tanner Stage 並和 Mirwald 公式結果交叉比對，判斷兩種評估是否一致。</div>
+      </div>
+
+      <!-- Checklist renders here -->
+      <div id="tChecklist"></div>
+
+      <!-- Tanner estimate result -->
+      <div id="tEstimate"></div>
+
+      <!-- Cross-validation -->
+      <div id="crossVal"></div>
+
+      <div class="warn-box">
+        <span class="warn-icon">⚠️</span>
+        <div>Tanner Stage 精準判斷須由<strong>小兒科或運動醫學專科醫師</strong>進行身體評估確認。本工具的推估結果僅供家長與教練參考方向，<strong>不可作為臨床診斷依據</strong>。如有疑慮請諮詢專業醫師。</div>
+      </div>
+    </div>
+
+    <!-- Training Recommendations -->
+    <div class="card">
+      <div class="card-title">訓練處方建議</div>
+      <div class="rec-grid" id="recGrid"></div>
+    </div>
+
+  </div><!-- /results -->
+</div><!-- /wrap -->
+
+<script>
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let gender = 'male';
+let mirwaldMO = null;   // stored after calc
+let checkedIds = new Set();
+
+/* ═══════════════════════════════════
+   CHECKLIST DATA
+   stage = first Tanner stage where this trait typically appears
+═══════════════════════════════════ */
+const CHECKLIST = {
+  male: [
+    {
+      group: '第二性徵 — 生殖器官',
+      items: [
+        { id:'mb1', stage:2, label:'睪丸或陰囊有輕微增大或皮膚顏色改變' },
+        { id:'mb2', stage:3, label:'陰莖開始明顯增長（主要是長度增加）' },
+        { id:'mb3', stage:4, label:'陰莖寬度也明顯增加，外觀接近成人大小' },
+        { id:'mb4', stage:5, label:'外生殖器已達成人形態與大小' },
+      ]
+    },
+    {
+      group: '體毛發育',
+      items: [
+        { id:'mb5', stage:2, label:'鼠蹊部出現少量、淡色、稀疏的陰毛' },
+        { id:'mb6', stage:3, label:'陰毛明顯增多、顏色加深、變粗變捲' },
+        { id:'mb7', stage:3, label:'腋毛開始出現' },
+        { id:'mb8', stage:4, label:'面部開始出現鬍鬚（上唇或下巴）' },
+        { id:'mb9', stage:5, label:'鬍鬚完整生長（需定期刮鬍子）' },
+      ]
+    },
+    {
+      group: '聲音、體型與肌肉',
+      items: [
+        { id:'mb10', stage:3, label:'聲音開始出現裂聲或明顯變化（轉音期）' },
+        { id:'mb11', stage:4, label:'聲音低沉穩定（變聲已完成）' },
+        { id:'mb12', stage:4, label:'肌肉量明顯增加，肩膀開始變寬' },
+        { id:'mb13', stage:5, label:'體型接近成人男性，外觀變化已趨緩' },
+      ]
+    }
+  ],
+  female: [
+    {
+      group: '乳房發育',
+      items: [
+        { id:'fg1', stage:2, label:'乳芽出現（乳房區域有輕微隆起或觸壓感）' },
+        { id:'fg2', stage:3, label:'乳房持續發育，明顯超出乳暈範圍' },
+        { id:'fg3', stage:4, label:'乳暈形成次級隆起（乳頭乳暈突出明顯）' },
+        { id:'fg4', stage:5, label:'乳房達成人最終形態（乳暈不再突出）' },
+      ]
+    },
+    {
+      group: '體毛發育',
+      items: [
+        { id:'fg5', stage:2, label:'出現少量、淡色的陰毛' },
+        { id:'fg6', stage:3, label:'陰毛增多、顏色加深、範圍擴大' },
+        { id:'fg7', stage:3, label:'腋毛開始出現' },
+        { id:'fg8', stage:5, label:'體毛分布達成人完整型態' },
+      ]
+    },
+    {
+      group: '骨盆、體型與生理週期',
+      items: [
+        { id:'fg9',  stage:2, label:'骨盆或臀部開始輕微擴寬' },
+        { id:'fg10', stage:3, label:'腰臀比例出現明顯差異（腰身開始出現）' },
+        { id:'fg11', stage:4, label:'月經來潮（初潮）' },
+        { id:'fg12', stage:5, label:'月經週期規律穩定，體型接近成人女性' },
+      ]
+    }
+  ]
+};
+
+const BADGE_CLS = { 2:'bs2', 3:'bs3', 4:'bs4', 5:'bs5' };
+const BADGE_LBL = { 2:'T2 起', 3:'T3 起', 4:'T4 起', 5:'T5 起' };
+
+/* ═══════════════════════════════════
+   RENDER CHECKLIST
+═══════════════════════════════════ */
+function renderChecklist() {
+  const groups = CHECKLIST[gender];
+  const wrap = document.getElementById('tChecklist');
+  wrap.innerHTML = '';
+
+  groups.forEach(grp => {
+    const gDiv = document.createElement('div');
+    gDiv.className = 't-group';
+    gDiv.innerHTML = `<div class="t-group-title">${grp.group}</div>`;
+
+    grp.items.forEach(item => {
+      const isChecked = checkedIds.has(item.id);
+      const row = document.createElement('div');
+      row.className = 't-check-item' + (isChecked ? ' checked' : '');
+      row.dataset.id = item.id;
+      row.dataset.stage = item.stage;
+      row.innerHTML = `
+        <div class="t-check-box">${isChecked ? '✓' : ''}</div>
+        <div class="t-check-label">${item.label}</div>
+        <div class="t-stage-badge ${BADGE_CLS[item.stage]}">${BADGE_LBL[item.stage]}</div>
+      `;
+      row.addEventListener('click', () => toggleCheck(item.id, row));
+      gDiv.appendChild(row);
+    });
+
+    wrap.appendChild(gDiv);
+  });
+
+  updateEstimate();
+}
+
+/* ═══════════════════════════════════
+   TOGGLE CHECKBOX
+═══════════════════════════════════ */
+function toggleCheck(id, row) {
+  if (checkedIds.has(id)) {
+    checkedIds.delete(id);
+    row.classList.remove('checked');
+    row.querySelector('.t-check-box').textContent = '';
+  } else {
+    checkedIds.add(id);
+    row.classList.add('checked');
+    row.querySelector('.t-check-box').textContent = '✓';
+  }
+  updateEstimate();
+}
+
+/* ═══════════════════════════════════
+   ESTIMATE TANNER FROM CHECKLIST
+   Logic: highest stage with any checked item
+═══════════════════════════════════ */
+function estimateFromChecklist() {
+  let maxStage = 1;
+  CHECKLIST[gender].forEach(grp => {
+    grp.items.forEach(item => {
+      if (checkedIds.has(item.id)) {
+        maxStage = Math.max(maxStage, item.stage);
+      }
+    });
+  });
+  return maxStage;
+}
+
+/* ═══════════════════════════════════
+   TANNER → PHV PHASE
+   Per user spec:
+   Pre-PHV  = T1-2
+   Mid-PHV  = T2-3 (female) / T3-4 (male)
+   Post-PHV = T4-5
+═══════════════════════════════════ */
+function tannerToPhase(t, g) {
+  if (g === 'male') {
+    if (t <= 2) return 'pre';
+    if (t <= 4) return 'mid';   // T3–4
+    return 'post';
+  } else {
+    if (t <= 1) return 'pre';
+    if (t <= 3) return 'mid';   // T2–3
+    return 'post';
+  }
+}
+
+function moToPhase(mo) {
+  if (mo < -1) return 'pre';
+  if (mo <= 1)  return 'mid';
+  return 'post';
+}
+
+const PHASE_LABEL = {
+  pre:  'Pre-PHV（發育前期）',
+  mid:  'Mid-PHV（高峰期）',
+  post: 'Post-PHV（發育後期）'
+};
+const PHASE_COLOR = { pre:'#60c8ff', mid:'var(--amber)', post:'var(--purple)' };
+
+/* ═══════════════════════════════════
+   UPDATE ESTIMATE + CROSS-VAL
+═══════════════════════════════════ */
+function updateEstimate() {
+  const teEl   = document.getElementById('tEstimate');
+  const cvEl   = document.getElementById('crossVal');
+  const anyChecked = checkedIds.size > 0;
+
+  if (!anyChecked) {
+    teEl.innerHTML = `<div class="te-prompt">👆 請勾選上方外觀特徵，推估 Tanner Stage</div>`;
+    cvEl.innerHTML = '';
+    return;
+  }
+
+  const ts = estimateFromChecklist();
+  const phase = tannerToPhase(ts, gender);
+
+  const stageNames = ['','青春期前','青春期初','青春期中','青春期後','成熟期'];
+
+  teEl.innerHTML = `
+    <div class="tanner-estimate">
+      <div>
+        <div class="te-label">外觀自評結果</div>
+        <div class="te-stage" style="color:${PHASE_COLOR[phase]}">Tanner ${ts}</div>
+        <div class="te-phase">${stageNames[ts]}・${PHASE_LABEL[phase]}</div>
+      </div>
+      <div class="te-divider"></div>
+      <div class="te-note">依您勾選的特徵，推估孩子目前最高發育至 <strong>Tanner Stage ${ts}</strong>（${stageNames[ts]}）。若尚未勾選任何特徵，系統判為 Tanner 1。</div>
+    </div>
+  `;
+
+  // Cross-validation only if Mirwald has been run
+  if (mirwaldMO === null) {
+    cvEl.innerHTML = `<div style="text-align:center;font-size:.8rem;color:var(--t3);margin-top:14px;font-style:italic">請先完成上方的 Mirwald 計算，即可看到交叉驗證結果。</div>`;
+    return;
+  }
+
+  const moPhase      = moToPhase(mirwaldMO);
+  const moTanner     = estimateTannerFromMO(mirwaldMO, gender);
+  const moStageNames = ['','青春期前','青春期初','青春期中','青春期後','成熟期'];
+
+  // Compare phases
+  const phaseOrder = { pre:0, mid:1, post:2 };
+  const diff = Math.abs(phaseOrder[moPhase] - phaseOrder[phase]);
+
+  let matchCls, matchIcon, matchTitle, matchBody;
+  if (diff === 0) {
+    matchCls  = 'match-ok';
+    matchIcon = '✅';
+    matchTitle = '兩項評估結果吻合';
+    matchBody  = `Mirwald 公式與外觀特徵自評均指向 <strong>${PHASE_LABEL[phase]}</strong>，評估一致性高，結果可信度較佳。`;
+  } else if (diff === 1) {
+    matchCls  = 'match-warn';
+    matchIcon = '⚠️';
+    matchTitle = '輕微差異（相差一個階段）';
+    matchBody  = `Mirwald 推估 <strong>${PHASE_LABEL[moPhase]}</strong>，外觀自評推估 <strong>${PHASE_LABEL[phase]}</strong>。輕微差異屬正常範圍，個體發育時間點本即存在差異。建議持續觀察，3 個月後重新評估。`;
+  } else {
+    matchCls  = 'match-bad';
+    matchIcon = '🔴';
+    matchTitle = '明顯差異（相差兩個階段）';
+    matchBody  = `Mirwald 推估 <strong>${PHASE_LABEL[moPhase]}</strong>，外觀自評推估 <strong>${PHASE_LABEL[phase]}</strong>，差異較大。可能原因：測量數值有誤、體型特殊（早/晚熟個體）、或部分特徵判斷不確定。<strong>建議諮詢小兒科醫師</strong>進行正式 Tanner Stage 評估。`;
+  }
+
+  cvEl.innerHTML = `
+    <div class="crossval ${matchCls}">
+      <div class="cv-top">
+        <div class="cv-col">
+          <div class="cv-method">📐 Mirwald 公式</div>
+          <div class="cv-stage-val" style="color:${PHASE_COLOR[moPhase]}">Tanner ${moTanner}</div>
+          <div class="cv-phase-val">${moStageNames[moTanner]}・${PHASE_LABEL[moPhase]}</div>
+        </div>
+        <div class="cv-vs">VS</div>
+        <div class="cv-col">
+          <div class="cv-method">🔍 外觀特徵自評</div>
+          <div class="cv-stage-val" style="color:${PHASE_COLOR[phase]}">Tanner ${ts}</div>
+          <div class="cv-phase-val">${stageNames[ts]}・${PHASE_LABEL[phase]}</div>
+        </div>
+      </div>
+      <div class="cv-bottom">
+        <div class="cv-icon">${matchIcon}</div>
+        <div class="cv-text"><strong>${matchTitle}</strong><br>${matchBody}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════
+   ESTIMATE TANNER FROM MO (for cross-val display)
+═══════════════════════════════════ */
+function estimateTannerFromMO(mo, g) {
+  if (g === 'male') {
+    if (mo < -3)   return 1;
+    if (mo < -1.5) return 2;
+    if (mo < 0.5)  return 3;
+    if (mo < 2.0)  return 4;
+    return 5;
+  } else {
+    if (mo < -2.5) return 1;
+    if (mo < -1.0) return 2;
+    if (mo < 0.5)  return 3;
+    if (mo < 1.5)  return 4;
+    return 5;
+  }
+}
+
+/* ═══════════════════════════════════
+   GENDER TOGGLE
+═══════════════════════════════════ */
+function setGender(g, btn) {
+  gender = g;
+  checkedIds.clear();
+  document.querySelectorAll('.g-btn').forEach(b => b.classList.remove('on-male','on-female'));
+  btn.classList.add(g === 'male' ? 'on-male' : 'on-female');
+  // Re-render checklist if results are visible
+  if (document.getElementById('results').classList.contains('on')) {
+    renderChecklist();
+  }
+}
+
+/* ═══════════════════════════════════
+   MIRWALD FORMULA
+═══════════════════════════════════ */
+function calcMO(age, H, SH, W, g) {
+  const LL = H - SH;
+  if (g === 'male') {
+    return -9.236
+      + 0.0002708 * (LL * SH)
+      - 0.001663  * (age * LL)
+      + 0.007216  * (age * SH)
+      + 0.02292   * (W / H * 100);
+  } else {
+    return -7.709133
+      + 0.0042232 * (age * H)
+      - 0.153657  * (age * (W / H))
+      + 0.0771226 * (age * (SH / H * 100))
+      + 0.0004130 * (age * (W / H) * ((H - SH) / H * 100));
+  }
+}
+
+/* ═══════════════════════════════════
+   STAGE DATA
+═══════════════════════════════════ */
+function getStage(mo) {
+  if (mo < -2)   return { cls:'pre',  emoji:'🌱', name:'發育前期 — Early Pre-PHV',       desc:'成長速度尚未加速，骨骼系統穩定。這是建立多元運動技能、基礎動作模式與協調性的黃金窗口期。訓練重點應置於「技術」與「多樣化」，而非強度與專項化。' };
+  if (mo < -0.5) return { cls:'pre',  emoji:'🌿', name:'發育前期晚段 — Late Pre-PHV',    desc:'即將進入快速生長階段。動作技術應更加精緻，建議每3個月量測一次身高以追蹤生長速率。開始留意關節柔軟度與肌肉延展性的變化。' };
+  if (mo <= 0.5) return { cls:'peak', emoji:'⚡', name:'身高高峰期 — PHV Peak',           desc:'骨骼正在快速拉長，生長板（Growth Plate）最為脆弱。肌腱韌帶的適應速度追不上骨骼生長，是受傷風險最高的時期。必須大幅降低衝擊性訓練，以低強度、技術為主的訓練取代。' };
+  if (mo <= 2)   return { cls:'post', emoji:'💪', name:'發育後期早段 — Early Post-PHV',  desc:'身高增長趨緩，肌肉系統開始追上骨骼發育。荷爾蒙環境（尤其男生的睪酮）有利力量增長，可逐步引入阻力訓練，但仍需循序漸進。' };
+  return              { cls:'post', emoji:'🏆', name:'發育後期 — Post-PHV',             desc:'生長板趨向閉合，身體對結構性訓練耐受度大幅提升。可開始規劃系統化週期訓練計畫，並考慮引入運動科學監控工具（HRV、乳酸閾值、VO₂max 評估）。' };
+}
+
+/* ═══════════════════════════════════
+   RECS
+═══════════════════════════════════ */
+function getRecs(mo) {
+  if (mo < -2) return [
+    { t:'do',   l:'✅ 優先訓練', b:'多元運動技能（跑跳投接）、基礎動作模式（FMS）、協調性與平衡感' },
+    { t:'do',   l:'✅ 適合發展', b:'速度與敏捷基礎、有氧基礎建立、遊戲化體能訓練（自由玩耍非常重要）' },
+    { t:'warn', l:'⚠️ 適量進行', b:'自體重量阻力訓練、輕度技術專項化（保持多運動參與）' },
+    { t:'avoid',l:'🚫 避免事項', b:'過度早期專項化、長時間重複性動作（棒球連投、單一方向跑步）' },
+  ];
+  if (mo < -0.5) return [
+    { t:'do',   l:'✅ 優先訓練', b:'動作品質精進、多平面動作整合、神經肌肉控制（落地、轉向）' },
+    { t:'do',   l:'✅ 監控重點', b:'每3個月量測身高，記錄年生長速率；注意髖膝踝關節柔軟度是否下降' },
+    { t:'warn', l:'⚠️ 謹慎進行', b:'增加訓練量前先確認動作品質；避免突然提升訓練強度或量' },
+    { t:'avoid',l:'🚫 避免事項', b:'忽視柔軟度與活動度訓練；最大重量測試（1RM testing）' },
+  ];
+  if (mo <= 0.5) return [
+    { t:'warn', l:'⚡ PHV 高峰警示', b:'骨骼快速拉長，生長板最脆弱！立刻降低衝擊性訓練量（至少減少 40–60%）' },
+    { t:'do',   l:'✅ 安全的訓練', b:'游泳、騎車等低衝擊有氧；柔軟度與伸展；核心穩定；技術反覆練習' },
+    { t:'avoid',l:'🚫 必須避免', b:'大重量舉重、高強度跳躍著地（drop jump）、高容量反覆衝刺' },
+    { t:'warn', l:'⚠️ 就醫警示', b:'膝蓋前側痛（Osgood-Schlatter）或跟骨痛（Sever 病）出現，應立即就醫' },
+  ];
+  if (mo <= 2) return [
+    { t:'do',   l:'✅ 逐步引入', b:'阻力訓練（從自體重量到輕度負重）、速度專項發展、爆發力基礎（藥球、壺鈴擺盪）' },
+    { t:'do',   l:'✅ 優先強化', b:'動作效率與技術精進、無氧能力發展、基礎肌力動作（深蹲、硬舉、推拉模式）' },
+    { t:'warn', l:'⚠️ 謹慎進行', b:'最大力量測試需有教練督導；注意動作代償與不對稱問題' },
+    { t:'avoid',l:'🚫 仍需避免', b:'未確認動作品質前過度加重；忽視恢復品質（睡眠、飲食、心理）' },
+  ];
+  return [
+    { t:'do',   l:'✅ 全面發展', b:'系統化週期訓練（線性/波狀週期化）、最大肌力發展、爆發力訓練（奧林匹克舉重動作）' },
+    { t:'do',   l:'✅ 科學監控', b:'引入 HRV 監控恢復狀態、乳酸閾值評估、運動表現定期測試（衝刺、跳躍、敏捷）' },
+    { t:'warn', l:'⚠️ 持續監控', b:'確保充分恢復；留意過度訓練早期症狀（晨起心率升高、睡眠品質下降、情緒低落）' },
+    { t:'do',   l:'✅ 長期計畫', b:'開始與運動科學師合作，設計符合賽季的週期訓練計畫（GPP → SPP 轉換）' },
+  ];
+}
+
+/* ═══════════════════════════════════
+   MAIN RUN
+═══════════════════════════════════ */
+function showErr(msg) { const e=document.getElementById('errMsg'); e.textContent=msg; e.style.display='block'; }
+function hideErr()    { document.getElementById('errMsg').style.display='none'; }
+function sign(n)      { return n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2); }
+
+function run() {
+  hideErr();
+
+  const age = parseFloat(document.getElementById('age').value);
+  const H   = parseFloat(document.getElementById('height').value);
+  const SH  = parseFloat(document.getElementById('sitH').value);
+  const W   = parseFloat(document.getElementById('weight').value);
+
+  if ([age,H,SH,W].some(isNaN))   { showErr('請填寫全部四個欄位：年齡、身高、坐高、體重'); return; }
+  if (age < 6  || age > 18)        { showErr('年齡建議範圍：6 – 18 歲'); return; }
+  if (H < 80   || H > 220)         { showErr('身高數值異常，請確認單位為公分（cm）'); return; }
+  if (SH >= H)                     { showErr('坐高不能大於或等於站立身高'); return; }
+  if (SH < 40)                     { showErr('坐高數值異常（應為 40–130 cm 範圍）'); return; }
+  if (W < 10   || W > 150)         { showErr('體重數值異常，請確認單位為公斤（kg）'); return; }
+
+  const LL  = H - SH;
+  const SR  = SH / H * 100;
+  const mo  = calcMO(age, H, SH, W, gender);
+  const phvAge = age - mo;
+
+  mirwaldMO = mo;   // store globally for cross-val
+
+  // Metrics
+  document.getElementById('mLL').textContent   = LL.toFixed(1);
+  document.getElementById('mSR').textContent   = SR.toFixed(1);
+  document.getElementById('mMO').textContent   = sign(mo);
+  document.getElementById('mPA').textContent   = phvAge.toFixed(1);
+  const dist = -mo;
+  document.getElementById('mDist').textContent = (dist >= 0 ? `+${dist.toFixed(2)}` : dist.toFixed(2));
+
+  // Needle
+  const pct = Math.max(2, Math.min(97, ((mo + 4) / 8) * 100));
+  document.getElementById('needle').style.left = pct + '%';
+
+  // Stage card
+  const stage = getStage(mo);
+  const sc = document.getElementById('stageCard');
+  sc.className = `stage-card ${stage.cls}`;
+  document.getElementById('sEmoji').textContent = stage.emoji;
+  const sn = document.getElementById('sName');
+  sn.className = 'stage-name';
+  sn.textContent = stage.name;
+  document.getElementById('sDesc').textContent = stage.desc;
+
+  // Recommendations
+  document.getElementById('recGrid').innerHTML =
+    getRecs(mo).map(r => `<div class="rec-item ${r.t}"><div class="rec-lbl">${r.l}</div><div class="rec-body">${r.b}</div></div>`).join('');
+
+  // Show results & render checklist
+  const res = document.getElementById('results');
+  res.classList.add('on');
+  renderChecklist();
+
+  setTimeout(() => res.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+
+  // 存入資料庫
+  const athleteName = document.getElementById('athleteName').value.trim();
+  if (athleteName) {
+    saveRecord({
+      name: athleteName,
+      gender,
+      age,
+      height: H,
+      sit_height: SH,
+      weight: W,
+      mo,
+      phv_age: phvAge,
+      stage: getStage(mo).cls,
+      date: new Date().toISOString().slice(0, 10)
+    });
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+
+/* ═══════════════════════════════════
+   DATABASE — History & Save
+═══════════════════════════════════ */
+const API_BASE = '/api/records';
+
+const STAGE_LABEL = { pre:'發育前期', peak:'接近 PHV', post:'發育後期' };
+
+async function lookupHistory(name) {
+  const panel = document.getElementById('historyPanel');
+  if (!name) { panel.innerHTML = ''; return; }
+
+  panel.innerHTML = '<div class="history-wrap"><div class="history-loading">載入中…</div></div>';
+
+  try {
+    const res = await fetch(`${API_BASE}?name=${encodeURIComponent(name)}`);
+    if (!res.ok) throw new Error('server error');
+    const records = await res.json();
+    renderHistory(name, records);
+  } catch {
+    panel.innerHTML = '<div class="history-wrap"><div class="history-error">查詢失敗，請稍後再試</div></div>';
+  }
+}
+
+function renderHistory(name, records) {
+  const panel = document.getElementById('historyPanel');
+  if (!records.length) {
+    panel.innerHTML = `<div class="history-wrap">
+      <div class="history-hd">${name}</div>
+      <div class="history-empty">尚無紀錄，這將是第一筆</div>
+    </div>`;
+    return;
+  }
+  const rows = records.map(r => {
+    const moNum = Number(r.mo);
+    const moColor = moNum < -1 ? 'var(--cyan)' : moNum <= 1 ? 'var(--amber)' : 'var(--purple)';
+    const moText = moNum >= 0 ? `+${moNum.toFixed(1)}` : moNum.toFixed(1);
+    return `<tr>
+      <td>${r.date}</td>
+      <td style="color:${moColor};font-weight:600">${moText}</td>
+      <td>${Number(r.height).toFixed(1)}</td>
+      <td>${STAGE_LABEL[r.stage] || r.stage}</td>
+    </tr>`;
+  }).join('');
+  panel.innerHTML = `<div class="history-wrap">
+    <div class="history-hd">${name} 的歷史紀錄</div>
+    <table class="history-table">
+      <thead><tr><th>日期</th><th>MO 偏移</th><th>身高 (cm)</th><th>發育階段</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+async function saveRecord(data) {
+  try {
+    await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    // 存檔後重新載入歷史，讓最新一筆出現在列表
+    lookupHistory(data.name);
+  } catch {
+    console.warn('PHV record save failed — data not stored');
+  }
+}
+</script>
+</body>
+</html>

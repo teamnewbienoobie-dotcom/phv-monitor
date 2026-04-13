@@ -1,0 +1,8 @@
+.env
+node_modules/
+.claude/
+.playwright-mcp/
+brainstorm-mockup.html
+brainstorm-q1.png
+brainstorm-q2.png
+brainstorm-q3.png
