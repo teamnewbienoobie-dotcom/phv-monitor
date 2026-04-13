@@ -40,7 +40,7 @@ export async function onRequest(context) {
 
     try {
       const { results } = await env.DB.prepare(
-        `SELECT date, mo, height, stage
+        `SELECT id, date, mo, height, stage
          FROM phv_records
          WHERE name = ?
          ORDER BY date DESC
@@ -98,6 +98,30 @@ export async function onRequest(context) {
       return Response.json({ success: true, id: result.meta.last_row_id });
     } catch (err) {
       console.error('POST error:', err);
+      return Response.json({ error: 'database error' }, { status: 500 });
+    }
+  }
+
+  // ── DELETE：刪除紀錄 ──────────────────────────────
+  if (method === 'DELETE') {
+    const url = new URL(request.url);
+    const id   = url.searchParams.get('id');
+    const name = url.searchParams.get('name')?.trim();
+
+    try {
+      if (id) {
+        // 刪單筆
+        await env.DB.prepare(`DELETE FROM phv_records WHERE id = ?`).bind(Number(id)).run();
+        return Response.json({ success: true });
+      } else if (name) {
+        // 刪整個人
+        await env.DB.prepare(`DELETE FROM phv_records WHERE name = ?`).bind(name).run();
+        return Response.json({ success: true });
+      } else {
+        return Response.json({ error: 'need id or name' }, { status: 400 });
+      }
+    } catch (err) {
+      console.error('DELETE error:', err);
       return Response.json({ error: 'database error' }, { status: 500 });
     }
   }
