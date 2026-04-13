@@ -1,2 +1,7 @@
 name = "phv-monitor"
 pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "phv-monitor-db"
+database_id = "250d4e80-a8b8-48d9-8647-e8422d978160"
