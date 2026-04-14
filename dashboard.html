@@ -13,6 +13,39 @@ body {
   min-height: 100vh;
   padding: 32px 20px;
 }
+
+/* 登入畫面 */
+#loginOverlay {
+  position: fixed; inset: 0;
+  background: #0a0f1e;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+#loginBox {
+  background: #111827;
+  border: 1px solid #1e2d4a;
+  border-radius: 14px;
+  padding: 40px 36px;
+  width: 100%; max-width: 360px;
+  text-align: center;
+}
+#loginBox h2 { color: #00e5ff; font-size: 1rem; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+#loginBox p { color: #445; font-size: .8rem; margin-bottom: 28px; }
+#loginBox input {
+  width: 100%; padding: 11px 14px;
+  background: #0a0f1e; border: 1px solid #1e2d4a;
+  border-radius: 8px; color: #e0e0f0; font-size: .95rem;
+  margin-bottom: 14px; outline: none;
+}
+#loginBox input:focus { border-color: #00e5ff55; }
+#loginBtn {
+  width: 100%; padding: 11px;
+  background: #00e5ff22; border: 1px solid #00e5ff55;
+  border-radius: 8px; color: #00e5ff;
+  font-size: .95rem; cursor: pointer; transition: background .15s;
+}
+#loginBtn:hover { background: #00e5ff33; }
+#loginErr { color: #e74c3c; font-size: .8rem; margin-top: 10px; min-height: 18px; }
 h1 {
   font-size: 1.2rem;
   color: #00e5ff;
@@ -117,6 +150,17 @@ td { padding: 10px 16px; border-top: 1px solid #1a2235; color: #bbc; white-space
 </head>
 <body>
 
+<!-- 登入畫面 -->
+<div id="loginOverlay">
+  <div id="loginBox">
+    <h2>PHV Monitor</h2>
+    <p>後台管理系統</p>
+    <input type="password" id="pwInput" placeholder="請輸入密碼" autocomplete="current-password" />
+    <button id="loginBtn" onclick="doLogin()">登入</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
 <h1>PHV Monitor — 後台管理</h1>
 <p class="subtitle">所有運動員資料總覽</p>
 
@@ -124,6 +168,60 @@ td { padding: 10px 16px; border-top: 1px solid #1a2235; color: #bbc; white-space
 <div id="list"><div class="loading">載入中…</div></div>
 
 <script>
+// ── 登入邏輯 ──────────────────────────────────────────
+const SESSION_KEY = 'phv_admin_token';
+
+async function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  const err = document.getElementById('loginErr');
+  if (!pw) { err.textContent = '請輸入密碼'; return; }
+
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pw })
+  });
+  const data = await res.json();
+
+  if (res.ok && data.token) {
+    sessionStorage.setItem(SESSION_KEY, data.token);
+    document.getElementById('loginOverlay').style.display = 'none';
+    load();
+  } else {
+    err.textContent = '密碼錯誤，請再試一次';
+    document.getElementById('pwInput').value = '';
+  }
+}
+
+function getToken() {
+  return sessionStorage.getItem(SESSION_KEY);
+}
+
+async function checkSession() {
+  const token = getToken();
+  if (!token) return false;
+  const res = await fetch('/api/auth', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  return res.ok;
+}
+
+// Enter 鍵也可登入
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pwInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  checkSession().then(ok => {
+    if (ok) {
+      document.getElementById('loginOverlay').style.display = 'none';
+      load();
+    }
+    // 若未登入，loginOverlay 預設顯示，不呼叫 load()
+  });
+});
+
+// ── 後台資料邏輯 ──────────────────────────────────────
 const STAGE_LABEL = { pre: '發育前期', peak: '接近 PHV', post: '發育後期' };
 const STAGE_CLS   = { pre: 'pre', peak: 'peak', post: 'post' };
 
@@ -225,8 +323,6 @@ function esc(s) {
 function escAttr(s) {
   return String(s).replace(/'/g,"\\'");
 }
-
-load();
 </script>
 </body>
 </html>
