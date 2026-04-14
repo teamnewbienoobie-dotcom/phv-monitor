@@ -81,27 +81,11 @@ export async function onRequestPost(context) {
   if (!geminiRes.ok) {
     const errData = await geminiRes.json().catch(() => ({}));
 
-    if (geminiRes.status === 429) {
-      // 區分每分鐘限制（RPM）和每日限制（RPD）
-      const msg = (errData?.error?.message || '').toLowerCase();
-      if (msg.includes('per minute') || msg.includes('rpm') || msg.includes('rate')) {
-        return Response.json(
-          { error: '請求太頻繁，請等待約 1 分鐘後再試。' },
-          { status: 429 }
-        );
-      }
-      return Response.json(
-        { error: '今日 AI 問答免費額度已用完，請明天再試。（Google Gemini 每日 1500 次）' },
-        { status: 429 }
-      );
-    }
-
-    // 其他錯誤：回傳原始 Gemini 訊息（方便偵錯）
+    // 直接回傳 Gemini 原始錯誤訊息（方便偵錯）
     const geminiMsg = errData?.error?.message || `Gemini HTTP ${geminiRes.status}`;
-    console.error('Gemini error:', geminiRes.status, geminiMsg);
     return Response.json(
-      { error: geminiMsg },
-      { status: 502 }
+      { error: `[Gemini ${geminiRes.status}] ${geminiMsg}` },
+      { status: geminiRes.status === 429 ? 429 : 502 }
     );
   }
 
