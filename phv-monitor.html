@@ -197,6 +197,54 @@ input[type=number]::placeholder{color:var(--t3)}
 /* ── FORMULA CHIP ── */
 .formula-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--t3);margin-top:18px}
 
+/* ── TRAINING OUTLINE ── */
+.to-intro{font-size:.85rem;color:var(--t2);line-height:1.7;margin-bottom:20px;padding:14px 18px;background:rgba(0,210,255,.05);border:1px solid rgba(0,210,255,.14);border-radius:9px}
+.to-pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.to-pillar{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:9px;padding:16px}
+.to-pillar-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.to-pillar-icon{font-size:1.4rem;line-height:1}
+.to-pillar-name{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase}
+.to-pillar-body{font-size:.81rem;color:var(--t2);line-height:1.65}
+.to-pillar-body li{margin-bottom:4px;list-style:none;padding-left:1em;position:relative}
+.to-pillar-body li::before{content:'›';position:absolute;left:0;color:var(--cyan-d)}
+.to-caution{background:rgba(255,160,50,.07);border:1px solid rgba(255,160,50,.22);border-radius:8px;padding:13px 17px;font-size:.82rem;color:rgba(255,195,100,.85);line-height:1.65;margin-top:6px}
+.to-caution strong{color:#ffd080}
+.to-source{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);margin-top:14px;text-align:right}
+
+/* ── YPD TABS ── */
+.to-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.to-tab{padding:8px 16px;border-radius:6px;background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.to-tab:hover{border-color:var(--cyan-d);color:var(--t2)}
+.to-tab.active{background:rgba(0,210,255,.1);border-color:rgba(0,210,255,.4);color:var(--cyan)}
+.to-tab-panel{display:none}
+.to-tab-panel.active{display:block;animation:fadeUp .3s ease}
+
+/* Weekly schedule */
+.to-week{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+.to-day{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.to-day-name{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.to-day-content{font-size:.8rem;color:var(--t2);line-height:1.65}
+.to-day-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.55rem;padding:2px 7px;border-radius:3px;margin-bottom:6px;letter-spacing:.5px}
+.tag-strength{background:rgba(0,255,150,.12);color:var(--green)}
+.tag-speed{background:rgba(0,210,255,.12);color:var(--cyan)}
+.tag-aerobic{background:rgba(255,180,50,.12);color:var(--amber)}
+.tag-mobility{background:rgba(160,80,255,.12);color:var(--purple)}
+.tag-rest{background:rgba(255,255,255,.06);color:var(--t3)}
+
+/* Exercises */
+.to-ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.to-ex-card{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.to-ex-cat{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.to-ex-list{font-size:.8rem;color:var(--t2);line-height:1.7;list-style:none;padding:0}
+.to-ex-list li{padding-left:1em;position:relative;margin-bottom:2px}
+.to-ex-list li::before{content:'›';position:absolute;left:0;color:var(--cyan-d)}
+
+/* Monitoring */
+.to-monitor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.to-monitor-item{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.to-monitor-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.to-monitor-body{font-size:.8rem;color:var(--t2);line-height:1.65}
+
 /* ── MOBILE ── */
 @media(max-width:540px){
   .card{padding:22px 18px}
@@ -219,6 +267,48 @@ input[type=number]::placeholder{color:var(--t3)}
 .inp-name{width:100%;background:rgba(0,0,0,.42);border:1px solid rgba(0,210,255,.2);border-radius:7px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:1.12rem;padding:14px 15px;outline:none;transition:border-color .2s,box-shadow .2s}
 .inp-name:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,210,255,.1)}
 .inp-name::placeholder{color:var(--t3)}
+
+/* ── FLOATING CHAT ── */
+#chatFab{position:fixed;bottom:28px;right:28px;z-index:999;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#054d70,#0778a8);border:1px solid var(--cyan);color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,210,255,.3);display:none;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#chatFab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,210,255,.45)}
+#chatFab .fab-badge{position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+
+#chatPanel{position:fixed;bottom:92px;right:28px;z-index:998;width:360px;max-width:calc(100vw - 40px);background:var(--bg-c);border:1px solid var(--border-b);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;max-height:520px}
+#chatPanel.open{display:flex}
+
+.cp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.3);flex-shrink:0}
+.cp-head-left{display:flex;flex-direction:column;gap:3px}
+.cp-title{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--cyan)}
+.cp-stage{font-size:.72rem;color:var(--t2)}
+.cp-close{background:none;border:none;color:var(--t3);font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s}
+.cp-close:hover{color:var(--t1)}
+
+.cp-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.cp-msgs::-webkit-scrollbar{width:4px}
+.cp-msgs::-webkit-scrollbar-track{background:transparent}
+.cp-msgs::-webkit-scrollbar-thumb{background:var(--border)}
+
+.cm{max-width:88%;padding:9px 13px;border-radius:10px;font-size:.83rem;line-height:1.65;word-break:break-word}
+.cm-user{align-self:flex-end;background:rgba(0,140,255,.2);border:1px solid rgba(0,210,255,.25);color:var(--t1)}
+.cm-ai{align-self:flex-start;background:rgba(0,0,0,.4);border:1px solid var(--border);color:var(--t2)}
+.cm-ai b,.cm-ai strong{color:var(--t1)}
+.cm-loading{align-self:flex-start;color:var(--t3);font-size:.78rem;font-style:italic;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:8px}
+
+.cp-sugs{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px;flex-shrink:0}
+.cp-sug{padding:5px 11px;border-radius:16px;background:rgba(0,210,255,.07);border:1px solid rgba(0,210,255,.18);color:var(--t2);font-size:.72rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.cp-sug:hover{background:rgba(0,210,255,.14);color:var(--t1)}
+
+.cp-foot{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:rgba(0,0,0,.2);flex-shrink:0}
+.cp-inp{flex:1;background:rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.18);border-radius:8px;color:var(--t1);font-family:'Noto Sans TC',sans-serif;font-size:.85rem;padding:9px 12px;outline:none;transition:border-color .2s;resize:none;min-height:38px;max-height:96px}
+.cp-inp:focus{border-color:var(--cyan)}
+.cp-send{padding:9px 14px;border-radius:8px;background:linear-gradient(135deg,#054d70,#0778a8);border:1px solid var(--cyan);color:#fff;font-size:1rem;cursor:pointer;transition:all .2s;flex-shrink:0}
+.cp-send:hover{box-shadow:0 0 12px rgba(0,210,255,.3)}
+.cp-send:disabled{opacity:.4;cursor:not-allowed}
+
+@media(max-width:480px){
+  #chatPanel{right:12px;bottom:82px;width:calc(100vw - 24px)}
+  #chatFab{right:16px;bottom:20px}
+}
 </style>
 </head>
 <body>
@@ -348,8 +438,39 @@ input[type=number]::placeholder{color:var(--t3)}
       <div class="rec-grid" id="recGrid"></div>
     </div>
 
+    <!-- ═══ YPD 訓練大綱 ═══ -->
+    <div class="card" id="trainingOutlineCard" style="display:none">
+      <div class="card-title">YPD 訓練大綱 &nbsp;—&nbsp; 基於 LTAD Network 課程</div>
+      <div id="trainingOutlineContent"></div>
+    </div>
+
+
   </div><!-- /results -->
 </div><!-- /wrap -->
+
+<!-- ── 浮動聊天按鈕 ── -->
+<button id="chatFab" onclick="toggleChat()" title="問教練">
+  💬
+  <span class="fab-badge"></span>
+</button>
+
+<!-- ── 聊天面板 ── -->
+<div id="chatPanel">
+  <div class="cp-head">
+    <div class="cp-head-left">
+      <div class="cp-title">ASK COACH</div>
+      <div class="cp-stage" id="cpStage">— 完成評估後啟用 —</div>
+    </div>
+    <button class="cp-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="cp-msgs" id="cpMsgs"></div>
+  <div class="cp-sugs" id="cpSugs"></div>
+  <div class="cp-foot">
+    <textarea class="cp-inp" id="cpInp" placeholder="輸入問題…" rows="1"
+      onkeydown="cpKeyDown(event)" oninput="autoResize(this)"></textarea>
+    <button class="cp-send" id="cpSend" onclick="cpSend()">➤</button>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════
@@ -771,6 +892,8 @@ function run() {
   const res = document.getElementById('results');
   res.classList.add('on');
   renderChecklist();
+  renderTrainingOutline(mo);
+  initChatForStage(mo);
 
   setTimeout(() => res.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
 
@@ -792,7 +915,211 @@ function run() {
   }
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') run();
+});
+
+/* ═══════════════════════════════════
+   YPD KNOWLEDGE BASE (distilled from LTAD Network YPD Pathway)
+═══════════════════════════════════ */
+const YPD_PHASES = {
+  pre: {
+    label: 'Pre-PHV — Foundation Phase',
+    color: '#60c8ff',
+    intro: 'Pre-PHV 是建立「運動人」基礎的黃金窗口期。此階段神經系統可塑性最高，動作技術學習效率最佳。訓練重點在於廣度（多元動作能力）而非深度（專項強度）。',
+    pillars: [
+      { icon: '🏃', name: '多元動作發展', body: ['跑、跳、投、接等基礎運動技能', '多平面（矢狀面、額狀面、橫切面）動作模式', '雙側與單側動作均衡發展', '透過遊戲化訓練提高參與動機'] },
+      { icon: '💪', name: '基礎肌力', body: ['技術優先於負重，動作質量是唯一標準', '自體重量動作為主（深蹲、伏地挺身、弓步）', '全活動範圍訓練，建立肌肉平衡', '每週 2–3 次，每次肌力訓練不超過 30 分鐘'] },
+      { icon: '⚡', name: '速度與敏捷', body: ['加速跑基礎技術（前傾、高膝、短步頻）', '方向改變基礎動作（剎車、轉向、啟動）', '以遊戲和運動情境脈絡化敏捷訓練', '初步建立最大速度跑步技術意識'] },
+      { icon: '🦘', name: '跳躍與著地', body: ['雙腳跳躍 → 單腳跳躍循序漸進', '著地技術（屈膝緩衝、重心控制）為最優先', '增強式訓練：低強度、高動作品質', '醫藥球投擲：上肢爆發力基礎建立'] },
+      { icon: '🫁', name: '有氧基礎', body: ['持續有氧運動（跑步、游泳、騎車）', '心肺耐力是所有體能發展的基石', '以趣味性和多樣性維持長期參與', '避免單一運動的過度重複性負荷'] },
+    ],
+    caution: '⚠️ <strong>關鍵提醒：</strong>每 3 個月量測一次身高，計算年增長速率（cm/year）。當身高增長明顯加速（男生 >7 cm/year，女生 >6 cm/year），代表即將進入 PHV 高峰，需調整訓練策略。避免過早專項化和最大重量測試。',
+    weeklySchedule: [
+      { day: '週一', tag: 'speed', tagName: '速度敏捷', content: '動態熱身 10 min\n短加速跑 4×20m（技術為主）\n敏捷遊戲：梯狀訓練 / 標誌錐\n方向改變基礎練習 3×8 次\n緩和伸展 10 min' },
+      { day: '週二', tag: 'aerobic', tagName: '有氧活動', content: '輕鬆慢跑 / 游泳 / 騎車 25–35 min\n可選擇趣味性多運動（足球、籃球）\n不強調強度，保持心跳在舒適範圍' },
+      { day: '週三', tag: 'strength', tagName: '肌力訓練', content: '動態熱身 10 min\n自體重量深蹲 3×10\n伏地挺身 3×8\n弓步走 3×10 步（單腳）\n熊爬 / 動物流動動作 2×15m\n核心穩定：平板撐 3×20s\n著地技術：雙腳跳躍落地練習' },
+      { day: '週四', tag: 'rest', tagName: '休息 / 恢復', content: '主動恢復：散步、輕度伸展\n靜態伸展：全身各大肌群\n可進行自由遊戲，不強制訓練量' },
+      { day: '週五', tag: 'strength', tagName: '肌力 + 跳躍', content: '動態熱身 10 min\n單腳硬舉（無負重）3×8 每側\n肩推（輕負重）3×10\n雙腳跳 → 箱跳著地 3×6\n醫藥球胸前推 3×8\n核心：側棒式 2×20s' },
+      { day: '週六', tag: 'aerobic', tagName: '多元運動', content: '參與多種運動（非固定單一項目）\n足球、籃球、游泳、騎車任選\n目標：廣泛動作經驗，維持樂趣\n避免競技壓力，以參與為主' },
+      { day: '週日', tag: 'rest', tagName: '完全休息', content: '身體恢復日\n充足睡眠（9–10 小時）\n均衡飲食，補充蛋白質與碳水\n可進行 10–15 分鐘全身伸展' },
+    ],
+    exercises: [
+      { cat: '下肢肌力', icon: '🦵', items: ['自體重量深蹲（腳跟需踩地，全蹲）', '分腿蹲 / 弓步走', '單腳硬舉（無負重，訓練平衡）', '腳踝提踵（站立 / 坐姿）', '側向弓步（額狀面）'] },
+      { cat: '上肢與核心', icon: '💪', items: ['伏地挺身（標準 / 跪姿）', '引體向上輔助版 / TRX划船', '肩推（輕負重啞鈴）', '平板撐 / 側棒式', '死蟲式（Dead Bug）核心控制'] },
+      { cat: '速度與敏捷', icon: '⚡', items: ['A-Skip、B-Skip 跑步動作練習', '起跑技術：靜態 → 反應啟動', '梯形訓練（雙腳 / 單腳進入）', '標誌錐折返跑（5-10-5 drill）', '反應式方向改變遊戲'] },
+      { cat: '跳躍與爆發', icon: '🦘', items: ['雙腳垂直跳（重心控制）', '雙腳跳箱（低高度，著地優先）', '水平跳（跳遠，軟著地）', '醫藥球胸前推擲 / 頭頂投擲', '2 kg 醫藥球旋轉投擲'] },
+    ],
+    monitoring: [
+      { label: '每 3 個月', body: '量測站立身高（精確至 0.1 cm）\n計算年增長速率（cm/year）\n若 >7 cm/year（男）或 >6 cm/year（女），注意 PHV 接近' },
+      { label: '基礎動作評估', body: 'FMS（功能性動作篩檢）7 項\n重點觀察：深蹲品質、旋轉對稱性、核心穩定\n有不對稱或疼痛立即停訓' },
+      { label: '速度基準', body: '30m 衝刺計時（起跑技術觀察為主）\n每學期紀錄一次作為成長基準\n不用於競爭比較，僅個人縱向追蹤' },
+      { label: '主觀感受', body: '每週詢問訓練後有無關節疼痛\n特別留意膝蓋前側、跟骨後方\n任何持續性疼痛需立即就醫' },
+    ],
+  },
+  mid: {
+    label: 'Mid-PHV — Bridge Phase',
+    color: '#ffb347',
+    intro: 'PHV 高峰期是訓練管理最關鍵的時間點。骨骼快速拉長，肌腱韌帶適應滯後，生長板（Growth Plate）最脆弱。此階段的核心原則是：<strong>降低衝擊，維持動作品質，保護結構完整性。</strong>',
+    pillars: [
+      { icon: '🛡️', name: '衝擊管理', body: ['立即將高衝擊訓練量降低 40–60%', '暫停 Drop Jump、高強度反覆衝刺', '以游泳、騎車等低衝擊有氧取代', '密切監控膝蓋前側（Osgood-Schlatter）和跟骨（Sever）疼痛'] },
+      { icon: '🧘', name: '柔軟度與活動度', body: ['快速生長導致肌肉相對緊繃，積極伸展是必要的', '重點：髖屈肌、股四頭肌、腓腸肌伸展', '每天 10–15 分鐘靜態或動態伸展', '有助預防因生長造成的動作代償'] },
+      { icon: '🏋️', name: '技術維持', body: ['低負重下維持基礎動作技術（深蹲、硬舉姿勢）', '絕對禁止 1RM 最大重量測試', '神經肌肉控制訓練（平衡板、單腳站立）', '核心穩定為主要力量訓練方向'] },
+      { icon: '📊', name: '監控重點', body: ['每月量測身高，計算生長速率（PHV 高峰可達 10 cm/year）', '追蹤關節活動度變化（可能在快速生長期下降）', '詢問是否有關節疼痛、不舒服的感覺', '記錄訓練量與疲勞感以調整負荷'] },
+    ],
+    caution: '⚠️ <strong>緊急就醫指標：</strong>膝蓋前側在活動後持續疼痛（Osgood-Schlatter 病）、跟骨後方壓痛（Sever 病）、或脊椎側彎症狀惡化，應立即停止訓練並就醫。這些在 PHV 高峰期是高發狀況。',
+    weeklySchedule: [
+      { day: '週一', tag: 'mobility', tagName: '活動度 + 有氧', content: '動態熱身 10 min\n低強度有氧：游泳 / 騎車 20–25 min（心跳 <150 bpm）\n髖屈肌、股四頭肌靜態伸展各 30s×2\n腓腸肌 / 比目魚肌伸展' },
+      { day: '週二', tag: 'strength', tagName: '核心 + 低衝擊肌力', content: '動態熱身 8 min\n徒手深蹲（緩速 3秒下 / 1秒上）3×8\n側棒式 3×20s\n死蟲式 3×10\n平板撐 3×20s\n無跳躍——嚴格避免衝擊' },
+      { day: '週三', tag: 'aerobic', tagName: '低衝擊有氧', content: '游泳或騎車 30–35 min\n維持輕鬆配速，不計強度\n游泳：自由式技術動作練習\n騎車：平路輕鬆踩，保持呼吸順暢' },
+      { day: '週四', tag: 'rest', tagName: '休息 / 伸展', content: '完整伸展流程 15–20 min：\n• 股四頭肌（跪姿）\n• 髖屈肌（弓步伸展）\n• 胸大肌（門框伸展）\n• 腓腸肌（牆壁拉伸）\n可做瑜伽或皮拉提斯基礎動作' },
+      { day: '週五', tag: 'strength', tagName: '上肢 + 核心', content: '動態熱身 8 min\nTRX 划船 / 彈力帶划船 3×10\n伏地挺身（標準節奏）3×8\n肩推（輕負重）3×10\n棒式抬手抬腳 3×6 次\n頸部柔軟度活動' },
+      { day: '週六', tag: 'aerobic', tagName: '輕鬆活動', content: '散步 / 輕鬆騎車 20–30 min\n可參與低衝擊團體活動\n避免有跑跳的運動項目\n重點：心理放鬆，保持活躍習慣' },
+      { day: '週日', tag: 'rest', tagName: '完全休息', content: '身體恢復最優先\n充足睡眠（9–10 小時）\n注意飲食補充鈣質（骨骼快速生長期）\n全身靜態伸展 10 min' },
+    ],
+    exercises: [
+      { cat: '低衝擊有氧', icon: '🏊', items: ['游泳（自由式、蛙式、仰式）', '固定自行車 / 戶外騎車', '橢圓機（低阻力）', '輕鬆散步或水中慢跑', '皮划艇 / 划船機（低強度）'] },
+      { cat: '核心穩定', icon: '🧘', items: ['平板撐（標準 / 肘撐）', '側棒式（雙腳 / 單腳進階）', '死蟲式（Dead Bug）', '棒式抬手抬腳（對角線）', '橋式（雙腳 / 單腳）'] },
+      { cat: '柔軟度重點', icon: '🤸', items: ['髖屈肌拉伸（跪姿弓步）', '股四頭肌拉伸（站姿或側臥）', '腓腸肌 / 比目魚肌（牆壁拉伸）', '胸椎旋轉（坐姿或仰臥）', '肩膀後側伸展（跨胸拉伸）'] },
+      { cat: '技術維持（低負重）', icon: '🏋️', items: ['徒手深蹲（緩速控制，3秒降）', 'TRX 划船 / 彈力帶划船', '伏地挺身（維持姿勢品質）', '單腳站立平衡（眼開 → 眼閉）', '平衡板訓練（靜態穩定）'] },
+    ],
+    monitoring: [
+      { label: '每月身高量測', body: '精確記錄站立身高（早晨量測最準確）\n計算月增長率，PHV 高峰期可達 0.8–1 cm/月\n繪製成長曲線，追蹤 PHV 高峰位置' },
+      { label: '關節活動度', body: '每月評估髖關節、踝關節活動度\n快速生長期關節活動度可能下降 10–15°\n若活動度明顯下降，增加伸展時間' },
+      { label: '疼痛問卷', body: '每週詢問：膝蓋前側、跟骨後方、脊椎\nOsgood-Schlatter：脛骨粗隆壓痛\nSever 病：跟骨後下方壓痛\n任何持續 >3 天的疼痛需就醫' },
+      { label: '主觀疲勞評估', body: '每次訓練後 RPE 評分（1–10 分）\n維持 PHV 高峰期 RPE 在 5–6 以下\n晨起靜息心率若上升 5+ bpm，減少當天訓練量' },
+    ],
+  },
+  post: {
+    label: 'Post-PHV — Development / Performance Phase',
+    color: '#a47fff',
+    intro: 'Post-PHV 是體能發展的「爆炸性視窗」。骨骼生長板趨向閉合，肌肉系統開始追上骨骼，荷爾蒙環境（尤其男性睪酮）大幅有利肌力增長。這是引入結構化、漸進式阻力訓練的最佳時機。',
+    pillars: [
+      { icon: '🏋️', name: '漸進阻力訓練', body: ['從相對肌力（自體重量比）建立起，逐步增加外部負重', '主要動作模式：深蹲、硬舉、推、拉、單腳動作', 'Post-PHV 早期：高容量低強度 → 逐步提高強度', 'Post-PHV 晚期：可達 85%+ 1RM 強度區間'] },
+      { icon: '⚡', name: '爆發力發展', body: ['當基礎肌力建立後，引入奧林匹克舉重動作（Clean、Snatch 衍生）', '增強式訓練：雙腳 → 單腳 → 連續跳躍的進階', '力量-速度曲線全面發展（從 Heavy Strength 到 Ballistic Power）', '醫藥球投擲：上肢爆發力系統訓練'] },
+      { icon: '🏃', name: '速度專項發展', body: ['加速（0–20m）與最大速度（30m+）分開訓練', '技術模型（PAL paradigm）指導跑步姿勢修正', '速度耐力和重複衝刺能力（RSA）訓練', '每週至少 2 次速度刺激，避免速度品質下降'] },
+      { icon: '📅', name: '週期化計畫', body: ['開始規劃年度訓練計畫（Annual Training Plan）', 'GPP（一般體能準備）→ SPP（專項體能準備）週期轉換', '4 週中觀週期（Mesocycle）設計：3:1 負荷:恢復比例', '賽季前、中、後的訓練強度與容量調配'] },
+      { icon: '📊', name: '科學監控', body: ['引入 1RM 估算測試（Epley equation 或 VBT）', 'CMJ（反向跳）監控神經肌肉疲勞狀態', 'HRV 晨起監測恢復品質（進階）', '定期衝刺測試（10m、20m、30m 計時）'] },
+    ],
+    caution: '💡 <strong>長期視角：</strong>Post-PHV 的訓練品質決定未來 10 年的運動表現天花板。不要因為急於看見成果而壓縮技術建立期。一個 Post-PHV 訓練設計良好的 16 歲運動員，20 歲的爆發力發展潛力遠超過急功近利的同儕。',
+    weeklySchedule: [
+      { day: '週一', tag: 'strength', tagName: '肌力 A（下肢主導）', content: '動態熱身 12 min\n背蹲（60–75% 1RM）4×5\n羅馬尼亞硬舉 3×8\n單腳深蹲（保加利亞分腿蹲）3×6\n小腿提踵 3×15\n核心：棒式系列 3 組' },
+      { day: '週二', tag: 'speed', tagName: '速度 + 敏捷', content: '動態熱身 12 min\n最大速度衝刺 4×30m（充分休息 3–4 min）\n加速跑 4×20m（起跑技術精進）\n敏捷訓練：5-10-5、T-drill\nCOD 速度練習（有防守者的情境）' },
+      { day: '週三', tag: 'aerobic', tagName: '有氧 + 恢復', content: '中強度有氧 30 min（心跳 60–70% HRmax）\n游泳 / 騎車 / 慢跑任選\n伸展與泡沫滾筒放鬆 15 min\n可加入技術動作精練（低強度）' },
+      { day: '週四', tag: 'strength', tagName: '肌力 B（上肢主導）', content: '動態熱身 10 min\n臥推 / 啞鈴推胸（70% 1RM）4×5\n引體向上 / 滑輪下拉 4×6\n肩推 3×8\n單臂划船 3×10\n農夫走路 3×20m' },
+      { day: '週五', tag: 'speed', tagName: '爆發力 + 速度耐力', content: '動態熱身 12 min\n增強式訓練：箱跳 3×5、連續跳 3×6\n醫藥球投擲系列 3×8\n速度耐力：6×100m（85–90% 強度，休息 90s）\n緩和跑 5 min + 伸展' },
+      { day: '週六', tag: 'strength', tagName: '肌力 C（全身）或運動訓練', content: '全身複合動作：爆發式推拉\n懸掛式上膊（Hang Clean）技術練習 4×3\n壺鈴盪壺（Kettlebell Swing）4×10\n或參與專項運動訓練 / 比賽' },
+      { day: '週日', tag: 'rest', tagName: '完全休息', content: '充足睡眠（8–9 小時）\n高蛋白質飲食支援肌肉合成\n輕鬆散步或主動恢復活動\n每兩週進行 HRV 評估（進階）' },
+    ],
+    exercises: [
+      { cat: '複合肌力動作', icon: '🏋️', items: ['背蹲（Barbell Back Squat）', '硬舉（Conventional / Romanian）', '臥推（Barbell / Dumbbell）', '引體向上（輔助 → 加重）', '農夫走路（Farmer Carry）'] },
+      { cat: '爆發力 / 奧舉衍生', icon: '⚡', items: ['懸掛式上膊（Hang Clean）', '藥球爆發式推擲 / 旋轉', '增強式箱跳（Box Jump）', '連續跳躍（Hurdle Hop）', '壺鈴盪壺（Kettlebell Swing）'] },
+      { cat: '速度專項', icon: '🏃', items: ['加速技術跑（0–20m 計時）', '最大速度衝刺（30–40m）', 'A-Skip / B-Skip 動作複習', '反應式 COD（有訊號的方向改變）', '重複衝刺訓練（RSA 30m×6）'] },
+      { cat: '單腳 / 矯正動作', icon: '🦵', items: ['保加利亞分腿蹲（後腳抬高）', '單腳羅馬尼亞硬舉', '側向弓步 + 醫藥球旋轉', 'Copenhagen Adductor 強化', '單腳跳 → 著地穩定控制'] },
+    ],
+    monitoring: [
+      { label: '1RM 肌力測試', body: '每 4–6 週進行 1RM 估算（Epley equation）\n深蹲、臥推、硬舉各主要動作\n以 3–5RM 最大努力計算估算值（更安全）\n目標：相對肌力提升（力量 / 體重比）' },
+      { label: 'CMJ 跳躍測試', body: '每週一次（晨起訓練前）反向跳（CMJ）\n使用測力板或跳躍墊記錄高度\n若連續 3 天下降 >10%，代表過度疲勞\n是最敏感的神經肌肉疲勞指標' },
+      { label: '衝刺計時', body: '每 4–6 週記錄 10m、20m、30m 計時\n固定計時方式（光電計時或手動）\n追蹤個人進步，不用於同儕比較\n加速區（0–10m）與最大速度區分開觀察' },
+      { label: 'HRV 與恢復品質', body: '晨起靜息 HRV 監測（進階，建議工具：HRV4Training）\nHRV 連續下降 3 天 → 降低當週訓練量\n結合主觀疲勞評分（RPE）和睡眠品質\n每月總結恢復趨勢，調整週期設計' },
+    ],
+  }
+};
+
+/* ═══════════════════════════════════
+   RENDER TRAINING OUTLINE
+═══════════════════════════════════ */
+function moToPhaseKey(mo) {
+  if (mo < -0.5) return 'pre';
+  if (mo <= 0.5) return 'mid';
+  return 'post';
+}
+
+function renderTrainingOutline(mo) {
+  const key   = moToPhaseKey(mo);
+  const phase = YPD_PHASES[key];
+  const el    = document.getElementById('trainingOutlineContent');
+
+  // 訓練原則 tab
+  const pillarsHtml = phase.pillars.map(p => `
+    <div class="to-pillar">
+      <div class="to-pillar-head">
+        <span class="to-pillar-icon">${p.icon}</span>
+        <span class="to-pillar-name">${p.name}</span>
+      </div>
+      <ul class="to-pillar-body">
+        ${p.body.map(b => `<li>${b}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+
+  const TAG_CLASS = { strength:'tag-strength', speed:'tag-speed', aerobic:'tag-aerobic', mobility:'tag-mobility', rest:'tag-rest' };
+
+  // 週課表 tab
+  const weekHtml = phase.weeklySchedule.map(d => `
+    <div class="to-day">
+      <div class="to-day-name">${d.day}</div>
+      <div class="to-day-tag ${TAG_CLASS[d.tag] || ''}">${d.tagName}</div>
+      <div class="to-day-content">${d.content.replace(/\n/g,'<br>')}</div>
+    </div>
+  `).join('');
+
+  // 重點動作 tab
+  const exHtml = phase.exercises.map(e => `
+    <div class="to-ex-card">
+      <div class="to-ex-cat">${e.icon} ${e.cat}</div>
+      <ul class="to-ex-list">${e.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+
+  // 監控指標 tab
+  const monHtml = phase.monitoring.map(m => `
+    <div class="to-monitor-item">
+      <div class="to-monitor-label">${m.label}</div>
+      <div class="to-monitor-body">${m.body.replace(/\n/g,'<br>')}</div>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="to-intro">${phase.intro}</div>
+
+    <div class="to-tabs">
+      <div class="to-tab active" onclick="switchTab(this,'tab-principles')">訓練原則</div>
+      <div class="to-tab" onclick="switchTab(this,'tab-schedule')">週課表</div>
+      <div class="to-tab" onclick="switchTab(this,'tab-exercises')">重點動作</div>
+      <div class="to-tab" onclick="switchTab(this,'tab-monitoring')">監控指標</div>
+    </div>
+
+    <div id="tab-principles" class="to-tab-panel active">
+      <div class="to-pillars">${pillarsHtml}</div>
+    </div>
+
+    <div id="tab-schedule" class="to-tab-panel">
+      <div class="to-week">${weekHtml}</div>
+    </div>
+
+    <div id="tab-exercises" class="to-tab-panel">
+      <div class="to-ex-grid">${exHtml}</div>
+    </div>
+
+    <div id="tab-monitoring" class="to-tab-panel">
+      <div class="to-monitor-grid">${monHtml}</div>
+    </div>
+
+    <div class="to-caution" style="margin-top:18px">${phase.caution}</div>
+    <div class="to-source">📚 來源：LTAD Network YPD Pathway — ${phase.label}</div>
+  `;
+
+  document.getElementById('trainingOutlineCard').style.display = '';
+}
+
+function switchTab(tabEl, panelId) {
+  tabEl.parentElement.querySelectorAll('.to-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.to-tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+
 
 /* ═══════════════════════════════════
    DATABASE — History & Save
@@ -857,6 +1184,152 @@ async function saveRecord(data) {
     lookupHistory(data.name);
   } catch {
     console.warn('PHV record save failed — data not stored');
+  }
+}
+
+/* ═══════════════════════════════════
+   FLOATING CHAT
+═══════════════════════════════════ */
+let chatHistory = [];
+let chatPhaseKey = null;
+
+const CHAT_SUGGESTIONS = {
+  pre:  ['Pre-PHV 每週該練幾次？', '跳躍著地技術怎麼教？', '這個階段可以做重訓嗎？', '如何用遊戲化方式訓練速度？'],
+  mid:  ['PHV 高峰期還能練什麼？', 'Osgood-Schlatter 怎麼處理？', '這階段柔軟度怎麼訓練？', '如何跟家長解釋要降低訓練量？'],
+  post: ['Post-PHV 肌力訓練怎麼排課？', '什麼時候可以開始奧舉？', '如何同時訓練速度和肌力？', 'CMJ 測試怎麼用？'],
+};
+
+function initChatForStage(mo) {
+  chatPhaseKey = moToPhaseKey(mo);
+  const phase  = YPD_PHASES[chatPhaseKey];
+  chatHistory  = [];
+
+  // 顯示浮動按鈕
+  const fab = document.getElementById('chatFab');
+  fab.style.display = 'flex';
+
+  // 更新面板標題
+  document.getElementById('cpStage').textContent = phase.label;
+
+  // 建議問題
+  const sugs = CHAT_SUGGESTIONS[chatPhaseKey] || [];
+  document.getElementById('cpSugs').innerHTML = sugs.map(s =>
+    `<span class="cp-sug" onclick="cpUseSug(this)">${s}</span>`
+  ).join('');
+
+  // 清空訊息，加入歡迎語
+  const msgs = document.getElementById('cpMsgs');
+  msgs.innerHTML = '';
+  cpAppend('ai', `👋 你好！根據剛才的評估，這位運動員目前處於 **${phase.label}**。\n\n有任何關於這個階段訓練的問題，都可以直接問我！`);
+}
+
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('cpInp').focus();
+  }
+}
+
+function cpAppend(role, text) {
+  const box = document.getElementById('cpMsgs');
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'cm cm-user' : 'cm cm-ai';
+  div.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function cpShowLoading() {
+  const box = document.getElementById('cpMsgs');
+  const div = document.createElement('div');
+  div.className = 'cm-loading';
+  div.id = 'cpLoading';
+  div.textContent = '教練思考中…';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function cpRemoveLoading() {
+  document.getElementById('cpLoading')?.remove();
+}
+
+function cpUseSug(el) {
+  document.getElementById('cpInp').value = el.textContent;
+  cpSend();
+}
+
+function cpKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cpSend(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 96) + 'px';
+}
+
+async function cpSend() {
+  const inp  = document.getElementById('cpInp');
+  const text = inp.value.trim();
+  if (!text || !chatPhaseKey) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  cpAppend('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const btn = document.getElementById('cpSend');
+  btn.disabled = true;
+  cpShowLoading();
+
+  try {
+    const phase = YPD_PHASES[chatPhaseKey];
+    const g = gender === 'male' ? '男性' : '女性';
+    const systemPrompt = `你是一位 LTAD Network YPD（Youth Physical Development）認證的青少年運動科學教練。
+
+## 當前運動員
+- 生理性別：${g}
+- PHV 發育階段：${phase.label}
+- Maturity Offset：${mirwaldMO ? mirwaldMO.toFixed(2) : 'N/A'}
+
+## 此階段訓練原則
+${phase.pillars.map(p => `【${p.name}】\n${p.body.map(b=>'• '+b).join('\n')}`).join('\n\n')}
+
+## 注意事項
+${phase.caution.replace(/<[^>]+>/g,'')}
+
+## 回答原則
+- 使用繁體中文
+- 具體可執行，避免空泛建議
+- 300 字以內，必要時用條列格式`;
+
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemPrompt,
+        messages: chatHistory.slice(-12) // 最多保留 6 輪對話
+      })
+    });
+
+    const data = await res.json();
+    cpRemoveLoading();
+
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    cpAppend('ai', data.text);
+    chatHistory.push({ role: 'assistant', content: data.text });
+    if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+
+  } catch (err) {
+    cpRemoveLoading();
+    cpAppend('ai', `❌ ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    document.getElementById('cpInp').focus();
   }
 }
 </script>

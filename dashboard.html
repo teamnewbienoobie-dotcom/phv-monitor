@@ -168,42 +168,36 @@ td { padding: 10px 16px; border-top: 1px solid #1a2235; color: #bbc; white-space
 <div id="list"><div class="loading">載入中…</div></div>
 
 <script>
-// ── 登入邏輯 ──────────────────────────────────────────
-const SESSION_KEY = 'phv_admin_token';
+// ── 登入邏輯（純前端 SHA-256）──────────────────────────
+const SESSION_KEY = 'phv_admin_auth';
+// 修改密碼：在終端機執行 node -e "const c=require('crypto');console.log(c.createHash('sha256').update('你的密碼').digest('hex'))"
+// 將輸出的 hash 貼到下面
+const ADMIN_HASH = '4a2bf17c03d25883c51dd19cda9fa78d5c14dc85f95fcf493204405c327dceeb'; // 預設密碼：phvadmin
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   const err = document.getElementById('loginErr');
   if (!pw) { err.textContent = '請輸入密碼'; return; }
 
-  const res = await fetch('/api/auth', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: pw })
-  });
-  const data = await res.json();
-
-  if (res.ok && data.token) {
-    sessionStorage.setItem(SESSION_KEY, data.token);
+  const hash = await sha256(pw);
+  if (hash === ADMIN_HASH) {
+    sessionStorage.setItem(SESSION_KEY, '1');
     document.getElementById('loginOverlay').style.display = 'none';
     load();
   } else {
+    await new Promise(r => setTimeout(r, 500)); // 防止暴力嘗試
     err.textContent = '密碼錯誤，請再試一次';
     document.getElementById('pwInput').value = '';
   }
 }
 
-function getToken() {
-  return sessionStorage.getItem(SESSION_KEY);
-}
-
 async function checkSession() {
-  const token = getToken();
-  if (!token) return false;
-  const res = await fetch('/api/auth', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
-  return res.ok;
+  return sessionStorage.getItem(SESSION_KEY) === '1';
 }
 
 // Enter 鍵也可登入
