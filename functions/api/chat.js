@@ -72,7 +72,7 @@ export async function onRequestPost(context) {
           role: m.role === 'assistant' ? 'model' : 'user',
           parts: [{ text: m.content }]
         })),
-        generationConfig: { maxOutputTokens: 800, temperature: 0.7 }
+        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
       })
     }
   );

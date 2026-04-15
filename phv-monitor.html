@@ -1192,6 +1192,28 @@ async function saveRecord(data) {
 ═══════════════════════════════════ */
 let chatHistory = [];
 let chatPhaseKey = null;
+let chatKnowledge = ''; // YPD 知識庫內容（依階段動態載入）
+
+/* 階段 → 對應知識庫檔案 */
+const PHASE_KNOWLEDGE_FILES = {
+  pre:  ['foundation.md', 'strength.md', 'speed-agility.md'],
+  mid:  ['development.md', 'strength.md', 'speed-agility.md'],
+  post: ['performance.md', 'development.md', 'periodization.md', 'speed-agility.md'],
+};
+
+async function loadKnowledge(phaseKey) {
+  const files = PHASE_KNOWLEDGE_FILES[phaseKey] || [];
+  const results = await Promise.allSettled(
+    files.map(f => fetch(`/knowledge/ypd/${f}`).then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    }))
+  );
+  return results
+    .filter(r => r.status === 'fulfilled')
+    .map(r => r.value)
+    .join('\n\n---\n\n');
+}
 
 const CHAT_SUGGESTIONS = {
   pre:  ['Pre-PHV 每週該練幾次？', '跳躍著地技術怎麼教？', '這個階段可以做重訓嗎？', '如何用遊戲化方式訓練速度？'],
@@ -1199,10 +1221,11 @@ const CHAT_SUGGESTIONS = {
   post: ['Post-PHV 肌力訓練怎麼排課？', '什麼時候可以開始奧舉？', '如何同時訓練速度和肌力？', 'CMJ 測試怎麼用？'],
 };
 
-function initChatForStage(mo) {
+async function initChatForStage(mo) {
   chatPhaseKey = moToPhaseKey(mo);
   const phase  = YPD_PHASES[chatPhaseKey];
   chatHistory  = [];
+  chatKnowledge = ''; // 重置
 
   // 顯示浮動按鈕
   const fab = document.getElementById('chatFab');
@@ -1221,6 +1244,16 @@ function initChatForStage(mo) {
   const msgs = document.getElementById('cpMsgs');
   msgs.innerHTML = '';
   cpAppend('ai', `👋 你好！根據剛才的評估，這位運動員目前處於 **${phase.label}**。\n\n有任何關於這個階段訓練的問題，都可以直接問我！`);
+
+  // 背景載入 YPD 知識庫
+  try {
+    chatKnowledge = await loadKnowledge(chatPhaseKey);
+    if (chatKnowledge) {
+      console.log(`[YPD] 已載入 ${chatPhaseKey} 階段知識庫（${(chatKnowledge.length / 1024).toFixed(0)} KB）`);
+    }
+  } catch (e) {
+    console.warn('[YPD] 知識庫載入失敗，將使用基本知識回答', e);
+  }
 }
 
 function toggleChat() {
@@ -1288,6 +1321,10 @@ async function cpSend() {
   try {
     const phase = YPD_PHASES[chatPhaseKey];
     const g = gender === 'male' ? '男性' : '女性';
+    const knowledgeSection = chatKnowledge
+      ? `\n\n## YPD 課程知識庫（LTAD Network 原始教材，優先參考）\n以下是此階段相關的 YPD Pathway 課程內容，回答時必須優先引用這些資料，而非你自己的通用知識：\n\n${chatKnowledge}`
+      : '';
+
     const systemPrompt = `你是一位 LTAD Network YPD（Youth Physical Development）認證的青少年運動科學教練。
 
 ## 當前運動員
@@ -1300,11 +1337,15 @@ ${phase.pillars.map(p => `【${p.name}】\n${p.body.map(b=>'• '+b).join('\n')}
 
 ## 注意事項
 ${phase.caution.replace(/<[^>]+>/g,'')}
+${knowledgeSection}
 
 ## 回答原則
 - 使用繁體中文
 - 具體可執行，避免空泛建議
-- 300 字以內，必要時用條列格式`;
+- 回答必須基於上方「YPD 課程知識庫」的內容，不可自行編造訓練建議
+- 若知識庫中有相關資訊，引用具體的課程概念、動作名稱或訓練處方
+- 若問題超出知識庫範圍，誠實告知並提供你的專業判斷，但需標註「此為補充建議，非 YPD 原始教材」
+- 500 字以內，必要時用條列格式`;
 
     const res = await fetch('/api/chat', {
       method: 'POST',
