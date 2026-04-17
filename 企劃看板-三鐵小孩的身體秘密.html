@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三鐵小孩的身體秘密 — 企劃看板 v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: #0a0a0f;
+    color: #e8e8ed;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 50px 24px 16px;
+  }
+  .header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f620, #06b6d420);
+    border: 1px solid #3b82f640;
+    border-radius: 100px;
+    padding: 6px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #60a5fa;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #a8a8b3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .header p {
+    font-size: 14px;
+    color: #8888a0;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Meta Strip ── */
+  .meta-strip {
+    display: flex; justify-content: center; gap: 24px;
+    padding: 20px 24px; flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex; align-items: center; gap: 8px;
+    background: #141419; border: 1px solid #1e1e28;
+    border-radius: 12px; padding: 10px 18px;
+  }
+  .meta-icon { font-size: 18px; }
+  .meta-label { font-size: 11px; color: #666; letter-spacing: 1px; }
+  .meta-value { font-size: 14px; font-weight: 700; color: #ddd; }
+
+  /* ── Role Legend ── */
+  .role-legend {
+    display: flex; justify-content: center; gap: 16px;
+    padding: 8px 24px 24px; flex-wrap: wrap;
+  }
+  .role-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+  }
+  .role-chip.coach { background: #3b82f620; border: 1px solid #3b82f640; color: #60a5fa; }
+  .role-chip.claude-role { background: #d4a57420; border: 1px solid #d4a57440; color: #d4a574; }
+  .role-chip.editor { background: #f472b620; border: 1px solid #f472b640; color: #f472b6; }
+  .role-chip.kid { background: #34d39920; border: 1px solid #34d39940; color: #34d399; }
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .role-dot.c-coach { background: #3b82f6; }
+  .role-dot.c-claude { background: #d4a574; }
+  .role-dot.c-editor { background: #f472b6; }
+  .role-dot.c-kid { background: #34d399; }
+
+  /* ── Timeline ── */
+  .timeline-section {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+  }
+  .section-title {
+    font-size: 13px; font-weight: 700; color: #555;
+    letter-spacing: 3px; text-transform: uppercase;
+    text-align: center; margin-bottom: 20px;
+  }
+
+  .timeline-bar {
+    display: flex; border-radius: 12px; overflow: hidden;
+    height: 48px; margin-bottom: 8px;
+    border: 1px solid #1e1e28;
+  }
+  .tl-seg {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+    position: relative; cursor: default;
+    transition: filter 0.2s;
+    white-space: nowrap; overflow: hidden;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .tl-seg:hover { filter: brightness(1.2); }
+  .tl-seg.seg0 { background: #555; flex: 10; }
+  .tl-seg.seg1 { background: linear-gradient(135deg, #ffd93d, #ff9500); flex: 40; }
+  .tl-seg.seg2 { background: linear-gradient(135deg, #34c759, #30b0c7); flex: 100; }
+  .tl-seg.seg3 { background: linear-gradient(135deg, #5ac8fa, #007aff); flex: 90; }
+  .tl-seg.seg4 { background: linear-gradient(135deg, #af52de, #5856d6); flex: 120; }
+  .tl-seg.seg5 { background: linear-gradient(135deg, #ff375f, #ff6b81); flex: 50; }
+  .tl-seg.seg6 { background: linear-gradient(135deg, #ff9500, #ff2d55); flex: 25; }
+
+  .timeline-labels {
+    display: flex; font-size: 10px; color: #555; padding: 0 2px;
+  }
+  .tl-label { text-align: center; }
+  .tl-label.l0 { flex: 10; }
+  .tl-label.l1 { flex: 40; }
+  .tl-label.l2 { flex: 100; }
+  .tl-label.l3 { flex: 90; }
+  .tl-label.l4 { flex: 120; }
+  .tl-label.l5 { flex: 50; }
+  .tl-label.l6 { flex: 25; }
+
+  /* ── Segment Cards ── */
+  .segments {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .seg-card {
+    background: #141419;
+    border: 1px solid #1e1e28;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .seg-card:hover { border-color: #333; }
+  .seg-card-top {
+    display: flex; align-items: stretch;
+  }
+  .seg-color {
+    width: 5px; flex-shrink: 0;
+  }
+  .seg-color.sc0 { background: #555; }
+  .seg-color.sc1 { background: linear-gradient(180deg, #ffd93d, #ff9500); }
+  .seg-color.sc2 { background: linear-gradient(180deg, #34c759, #30b0c7); }
+  .seg-color.sc3 { background: linear-gradient(180deg, #5ac8fa, #007aff); }
+  .seg-color.sc4 { background: linear-gradient(180deg, #af52de, #5856d6); }
+  .seg-color.sc5 { background: linear-gradient(180deg, #ff375f, #ff6b81); }
+  .seg-color.sc6 { background: linear-gradient(180deg, #ff9500, #ff2d55); }
+
+  .seg-content {
+    flex: 1; padding: 20px 24px;
+  }
+  .seg-top-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 8px; flex-wrap: wrap;
+  }
+  .seg-time {
+    font-size: 11px; font-weight: 600;
+    background: #1e1e28; border-radius: 6px;
+    padding: 3px 10px; color: #888;
+    font-family: monospace;
+  }
+  .seg-duration {
+    font-size: 11px; color: #555;
+  }
+  .seg-title {
+    font-size: 17px; font-weight: 700; color: #fff;
+    margin-bottom: 8px;
+  }
+  .seg-script {
+    font-size: 13px; color: #8888a0; line-height: 1.7;
+    margin-bottom: 12px;
+    border-left: 2px solid #2a2a36;
+    padding-left: 14px;
+  }
+  .seg-script strong { color: #ccc; }
+  .seg-script .highlight { color: #ffd93d; font-weight: 600; }
+  .seg-script .warn { color: #ff6b6b; font-weight: 600; }
+  .seg-visuals {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .vis-tag {
+    font-size: 11px; padding: 4px 12px;
+    border-radius: 100px; font-weight: 500;
+  }
+  .vis-tag.aroll { background: #3b82f615; border: 1px solid #3b82f630; color: #60a5fa; }
+  .vis-tag.broll { background: #34c75915; border: 1px solid #34c75930; color: #34d399; }
+  .vis-tag.graphic { background: #ffd93d15; border: 1px solid #ffd93d30; color: #ffd93d; }
+  .vis-tag.ai { background: #af52de15; border: 1px solid #af52de30; color: #c084fc; }
+  .vis-tag.archive { background: #ff6b3515; border: 1px solid #ff6b3530; color: #fb923c; }
+
+  /* ── Shoot Schedule ── */
+  .shoot-section {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+  }
+  .shoot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .shoot-card {
+    background: #141419;
+    border: 1px solid #1e1e28;
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.3s;
+  }
+  .shoot-card:hover { border-color: #333; }
+  .shoot-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .shoot-card.sh1 .shoot-num { color: #60a5fa; }
+  .shoot-card.sh2 .shoot-num { color: #c084fc; }
+  .shoot-card.sh3 .shoot-num { color: #34d399; }
+  .shoot-card.sh4 .shoot-num { color: #fbbf24; }
+  .shoot-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .shoot-time {
+    font-size: 12px; color: #666; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .shoot-items { list-style: none; }
+  .shoot-items li {
+    font-size: 12px; color: #888; line-height: 1.8;
+    padding-left: 14px; position: relative;
+  }
+  .shoot-items li::before {
+    content: ''; position: absolute; left: 0; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #333;
+  }
+  .shoot-equip {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid #1e1e28;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .equip-tag {
+    font-size: 10px; padding: 3px 10px;
+    background: #1e1e28; border-radius: 100px; color: #777;
+  }
+
+  /* ── Asset Checklist ── */
+  .asset-section {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+  }
+  .asset-group-title {
+    font-size: 12px; font-weight: 700; color: #555;
+    letter-spacing: 2px; margin-bottom: 10px; margin-top: 16px;
+  }
+  .asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px;
+  }
+  .asset-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #141419; border: 1px solid #1e1e28;
+    border-radius: 10px; padding: 10px 14px;
+    transition: background 0.2s;
+  }
+  .asset-item:hover { background: #1a1a22; }
+  .asset-check {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid #333; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+    font-size: 12px; color: transparent;
+  }
+  .asset-item.checked .asset-check {
+    background: #34c759; border-color: #34c759; color: #fff;
+  }
+  .asset-item.checked .asset-name { text-decoration: line-through; color: #555; }
+  .asset-name { font-size: 13px; color: #bbb; flex: 1; }
+  .asset-pri {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 100px; flex-shrink: 0;
+  }
+  .asset-pri.must { background: #ff6b6b20; color: #ff6b6b; }
+  .asset-pri.nice { background: #ffd93d20; color: #ffd93d; }
+
+  /* ── Publish Timeline ── */
+  .publish-section {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+  }
+  .pub-timeline {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+    padding-left: 60px;
+  }
+  .pub-timeline::before {
+    content: ''; position: absolute;
+    left: 24px; top: 12px; bottom: 12px;
+    width: 2px; background: #1e1e28;
+  }
+  .pub-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 0; position: relative;
+  }
+  .pub-dot {
+    position: absolute; left: -42px;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid #333; background: #0a0a0f;
+  }
+  .pub-item.active .pub-dot { background: #34c759; border-color: #34c759; }
+  .pub-day {
+    font-size: 12px; font-weight: 700; color: #888;
+    width: 50px; flex-shrink: 0;
+  }
+  .pub-content {
+    flex: 1; background: #141419; border: 1px solid #1e1e28;
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .pub-platform {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .pub-platform.yt { color: #ff4444; }
+  .pub-platform.ig { color: #e040fb; }
+  .pub-platform.fb { color: #4267b2; }
+  .pub-desc { font-size: 12px; color: #777; }
+
+  /* ── Title Candidates ── */
+  .titles-section {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 24px 32px;
+  }
+  .title-card {
+    background: #141419; border: 1px solid #1e1e28;
+    border-radius: 12px; padding: 14px 18px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+    transition: border-color 0.3s;
+  }
+  .title-card:hover { border-color: #333; }
+  .title-rank {
+    font-size: 20px; font-weight: 900; color: #333;
+    width: 32px; text-align: center; flex-shrink: 0;
+  }
+  .title-text { font-size: 14px; font-weight: 600; color: #ddd; flex: 1; }
+  .title-strat {
+    font-size: 10px; padding: 3px 10px;
+    background: #1e1e28; border-radius: 100px; color: #888;
+    flex-shrink: 0; white-space: nowrap;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 12px; color: #333;
+  }
+  .footer a { color: #555; text-decoration: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .seg-content { padding: 14px 16px; }
+    .tl-seg { font-size: 9px; }
+    .shoot-grid { grid-template-columns: 1fr; }
+    .pub-timeline { padding-left: 50px; }
+    .title-card { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-badge">PRODUCTION BOARD v2</div>
+  <h1>三鐵小孩的身體秘密</h1>
+  <p>帶兒子練三鐵才發現：小孩的身體根本是不同物種<br>菜逼爸教練 YouTube 企劃看板 — 2026.04.17</p>
+</div>
+
+<!-- ═══ META ═══ -->
+<div class="meta-strip">
+  <div class="meta-item">
+    <span class="meta-icon">&#x23F1;</span>
+    <div><div class="meta-label">LENGTH</div><div class="meta-value">7:15</div></div>
+  </div>
+  <div class="meta-item">
+    <span class="meta-icon">&#x1F3AC;</span>
+    <div><div class="meta-label">FORMAT</div><div class="meta-value">16:9 Story + Knowledge</div></div>
+  </div>
+  <div class="meta-item">
+    <span class="meta-icon">&#x1F4C5;</span>
+    <div><div class="meta-label">PUBLISH</div><div class="meta-value">SAT 09:00</div></div>
+  </div>
+  <div class="meta-item">
+    <span class="meta-icon">&#x1F3AF;</span>
+    <div><div class="meta-label">TARGET</div><div class="meta-value">6-12 歲孩子家長</div></div>
+  </div>
+</div>
+
+<!-- ═══ ROLES ═══ -->
+<div class="role-legend">
+  <span class="role-chip coach"><span class="role-dot c-coach"></span>菜逼爸 — 創作/配音</span>
+  <span class="role-chip claude-role"><span class="role-dot c-claude"></span>Claude — 企劃/文案</span>
+  <span class="role-chip editor"><span class="role-dot c-editor"></span>剪輯師 — 精剪/設計</span>
+  <span class="role-chip kid"><span class="role-dot c-kid"></span>小小運動員 — 演出/採訪</span>
+</div>
+
+<!-- ═══ TIMELINE BAR ═══ -->
+<div class="timeline-section">
+  <div class="section-title">TIMELINE</div>
+  <div class="timeline-bar">
+    <div class="tl-seg seg0">Hook</div>
+    <div class="tl-seg seg1">開場</div>
+    <div class="tl-seg seg2">有氧怪獸</div>
+    <div class="tl-seg seg3">軟糖 x 大腦</div>
+    <div class="tl-seg seg4">玩出三鐵力</div>
+    <div class="tl-seg seg5">比賽</div>
+    <div class="tl-seg seg6">End</div>
+  </div>
+  <div class="timeline-labels">
+    <div class="tl-label l0">0:10</div>
+    <div class="tl-label l1">0:50</div>
+    <div class="tl-label l2">2:30</div>
+    <div class="tl-label l3">4:00</div>
+    <div class="tl-label l4">6:00</div>
+    <div class="tl-label l5">6:50</div>
+    <div class="tl-label l6">7:15</div>
+  </div>
+</div>
+
+<!-- ═══ SEGMENT CARDS ═══ -->
+<div class="segments">
+
+  <!-- [0] Hook -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc0"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">0:00 — 0:10</span>
+          <span class="seg-duration">10 sec</span>
+        </div>
+        <div class="seg-title">預告鉤子</div>
+        <div class="seg-script">
+          「小孩心跳 200——<strong>正常的</strong>。跑全馬——<strong class="warn">會壞掉</strong>。練重量——<strong>可以，但不是你想的那種</strong>。」
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag aroll">A-Roll 半身</span>
+          <span class="vis-tag broll">B-Roll 快剪精華</span>
+          <span class="vis-tag graphic">字卡 x3 快閃</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [1] 開場 -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc1"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">0:10 — 0:50</span>
+          <span class="seg-duration">40 sec</span>
+        </div>
+        <div class="seg-title">核融合永動機</div>
+        <div class="seg-script">
+          核融合永動機 / PD 快充頭 / 台灣不缺電<br>
+          「既然電力這麼強，直接送去跑馬拉松？」<br>
+          <strong class="warn">「站在教練角度：這個想法，可能會毀掉孩子。」</strong><br>
+          預告全片三個關鍵詞：<span class="highlight">奧運選手</span> / <span class="highlight">軟糖</span> / <span class="highlight">三鐵力</span>
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag aroll">A-Roll 為主</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [2] 有氧怪獸 -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc2"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">0:50 — 2:30</span>
+          <span class="seg-duration">100 sec</span>
+        </div>
+        <div class="seg-title">有氧怪獸：Pre-PHV 的身體秘密</div>
+        <div class="seg-script">
+          <strong>定義 Pre-PHV</strong>（5-12 歲，身高成長高峰之前）<br><br>
+          <strong>研究揭密：</strong>30 秒衝刺實驗 → 小孩肌肉代謝 ≈ 奧運長跑選手<br>
+          <strong>比喻：</strong>大人 = 汽油跑車 / 小孩 = <span class="highlight">油電混合車</span><br>
+          「他不是過動，他是進化得比我們更好」<br><br>
+          <strong class="warn">致命弱點：無氧系統</strong><br>
+          PFK 酵素未發育 → 30-90 秒全力衝刺 = 代謝死胡同<br><br>
+          <strong class="warn">新聞引用：</strong>國小三年級女兒被逼跑 42K 全馬<br>
+          醫學警告：生長板受損、影響發育、內分泌失調<br>
+          「有氧小怪獸 ≠ 能讓他跑全馬」
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag aroll">A-Roll 口述</span>
+          <span class="vis-tag graphic">數據圖卡（無氧/有氧比）</span>
+          <span class="vis-tag graphic">PFK 圖解</span>
+          <span class="vis-tag broll">操場跑步 B-Roll</span>
+          <span class="vis-tag graphic">新聞摘要文字卡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [3] 軟糖 x 大腦 -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc3"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">2:30 — 4:00</span>
+          <span class="seg-duration">90 sec</span>
+        </div>
+        <div class="seg-title">軟糖骨頭 x 大腦修剪</div>
+        <div class="seg-script">
+          <strong>生長板 = 軟糖</strong>：骨頭末端的軟骨工廠，青春期前都是軟的<br>
+          最怕「長時間 x 高重複」→ 全馬 = 鐵鎚敲軟糖<br>
+          <span class="highlight">耐力訓練優先：游泳 + 單車</span><br><br>
+          <strong>大腦拆遷工程</strong>：5 歲神經連結巔峰 → 品管部門上線<br>
+          <span class="highlight">鋪柏油（用到的路）</span> vs <span class="warn">怪手拆遷（沒用的路）</span><br>
+          <strong>Use it or Lose it</strong> — Pre-PHV 是施工效率最高的階段<br>
+          「接下來的訓練，核心邏輯：<strong>盡可能多鋪路</strong>」
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag aroll">A-Roll 口述</span>
+          <span class="vis-tag ai">AI 生長板軟糖圖</span>
+          <span class="vis-tag ai">AI 神經修剪動畫</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [4] 訓練 -->
+  <div class="seg-card" style="border-color: #af52de40;">
+    <div class="seg-card-top">
+      <div class="seg-color sc4"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">4:00 — 6:00</span>
+          <span class="seg-duration">120 sec &#x2B50; 視覺核心</span>
+        </div>
+        <div class="seg-title">從最大化神經可塑性玩出三鐵力</div>
+        <div class="seg-script">
+          <strong style="color:#c084fc;">核心概念：騎車串公園</strong><br><br>
+
+          <strong>腳踏車 = 最完美的有氧打底</strong><br>
+          對生長板壓力趨近於零 → 可拉長距離 → 小孩天生愛騎<br><br>
+
+          <strong>探索全台北市公園計畫：</strong><br>
+          1. 跟孩子一起畫騎乘地圖<br>
+          2. 騎到公園 → 下車挑戰關卡<br>
+          3. 完成 → 上車 → 騎去下一站<br><br>
+
+          <strong>公園關卡（3-5 分鐘一組）：</strong><br>
+          &#x1F535; Monkey Bar → 上肢懸吊+握力<br>
+          &#x1F7E2; 跳格子 → 下肢協調+節奏<br>
+          &#x1F7E1; 單槓/攀爬 → 神經肌肉連結<br>
+          &#x1F534; 60m 衝刺（&lt;30 秒）→ 避開代謝死胡同<br><br>
+
+          「<span class="highlight">騎車是有氧，公園是肌力，串起來就是 HIFT</span>」<br><br>
+
+          <strong>+ 游泳</strong>：低衝擊專項，水感為主，一週兩次<br>
+          <strong>+ 健行</strong>：3km → 5km → 一日，最天然的 Zone 2
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag broll">騎車出發跟拍</span>
+          <span class="vis-tag broll">地圖道具特寫</span>
+          <span class="vis-tag broll">公園關卡實拍 x4</span>
+          <span class="vis-tag broll">游泳水下</span>
+          <span class="vis-tag broll">健行步道</span>
+          <span class="vis-tag aroll">A-Roll 穿插</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [5] 比賽 -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc5"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">6:00 — 6:50</span>
+          <span class="seg-duration">50 sec</span>
+        </div>
+        <div class="seg-title">比賽剪影 + 小小運動員心路</div>
+        <div class="seg-script">
+          <strong>比賽旁白：</strong>「游泳時我站在池邊，手比他還抖」<br>
+          「騎車過彎——我承認，我比他還緊張」<br>
+          「最後的跑步，他跑得不快，但他跑完了」<br><br>
+          <strong>父子採訪（挑 2-3 題）：</strong><br>
+          - 練三鐵好玩嗎？哪個最好玩？<br>
+          - 比賽時在想什麼？<br>
+          - 有想放棄的時候嗎？<br>
+          - 爸爸教你有很討厭的部分嗎？（笑）<br><br>
+          <em style="color:#666;">保留童言童語、笑場、停頓 — 真實感 > 流暢度</em>
+        </div>
+        <div class="seg-visuals">
+          <span class="vis-tag archive">過往比賽素材</span>
+          <span class="vis-tag broll">父子對談採訪</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [6] 收尾 -->
+  <div class="seg-card">
+    <div class="seg-card-top">
+      <div class="seg-color sc6"></div>
+      <div class="seg-content">
+        <div class="seg-top-row">
+          <span class="seg-time">6:50 — 7:15</span>
+          <span class="seg-duration">25 sec</span>
+        </div>
+        <div class="seg-title">親子接力賽</div>
+        <div class="seg-script" style="font-style: italic; border-left-color: #ff950060;">
+          陪著孩子在三鐵中磨練——<br>
+          其實是一場<strong>親子關係的接力賽</strong>。<br>
+          我們留下的每一滴汗水——<br>
+          都是在為他的生命<strong>紮根</strong>。<br><br>
+          因為這份愛——<br>
+          終將化作他羽翼下的風。<br>
+          讓他能帶著這份祝福——<br>
+          <strong>強壯地、自信地</strong>——<br>
+          漸漸走出我們的視野。
+        </div>
+        <div style="margin-top:12px; padding:10px 14px; background:#1a1a22; border-radius:10px; font-size:12px; color:#888;">
+          <strong style="color:#aaa;">片尾字卡（黑底白字，靜音 3s）：</strong><br>
+          「小孩不是縮小版的大人。但他可以是，比大人更強悍的運動員。」——菜逼爸教練
+        </div>
+        <div class="seg-visuals" style="margin-top:10px;">
+          <span class="vis-tag broll">夕陽父子背影</span>
+          <span class="vis-tag broll">慢動作跑步</span>
+          <span class="vis-tag graphic">片尾字卡+訂閱動畫</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ SHOOT SCHEDULE ═══ -->
+<div class="shoot-section">
+  <div class="section-title">SHOOT SCHEDULE</div>
+  <div class="shoot-grid">
+
+    <div class="shoot-card sh1">
+      <div class="shoot-num">SHOOT 1</div>
+      <div class="shoot-title">室內 A-Roll</div>
+      <div class="shoot-time">&#x23F1; 約 1.5 小時</div>
+      <ul class="shoot-items">
+        <li>全部口述段落一次錄完</li>
+        <li>換 2-3 套衣服</li>
+        <li>收音品質最優先</li>
+      </ul>
+      <div class="shoot-equip">
+        <span class="equip-tag">手機+腳架</span>
+        <span class="equip-tag">收音麥克風</span>
+      </div>
+    </div>
+
+    <div class="shoot-card sh2" style="border-color:#af52de40;">
+      <div class="shoot-num">SHOOT 2 &#x2B50; 核心場次</div>
+      <div class="shoot-title">騎車串公園</div>
+      <div class="shoot-time">&#x23F1; 約 3 小時</div>
+      <ul class="shoot-items">
+        <li>出發前畫地圖（桌面特寫）</li>
+        <li>騎車街道/河濱（跟拍+空拍）</li>
+        <li>3-4 個公園的關卡實拍</li>
+        <li>Monkey Bar / 跳格子 / 單槓 / 衝刺</li>
+        <li>休息→上車→下一站</li>
+      </ul>
+      <div class="shoot-equip">
+        <span class="equip-tag">Pocket（太太）</span>
+        <span class="equip-tag">Action 5（POV）</span>
+        <span class="equip-tag">空拍機</span>
+        <span class="equip-tag">腳踏車 x2</span>
+        <span class="equip-tag">手繪地圖道具</span>
+      </div>
+    </div>
+
+    <div class="shoot-card sh3">
+      <div class="shoot-num">SHOOT 3</div>
+      <div class="shoot-title">游泳實拍</div>
+      <div class="shoot-time">&#x23F1; 約 1 小時</div>
+      <ul class="shoot-items">
+        <li>潛水抓物</li>
+        <li>水下翻滾</li>
+        <li>水感練習</li>
+      </ul>
+      <div class="shoot-equip">
+        <span class="equip-tag">Action 5（防水）</span>
+      </div>
+    </div>
+
+    <div class="shoot-card sh4">
+      <div class="shoot-num">SHOOT 4</div>
+      <div class="shoot-title">健行 + 採訪 + 收尾</div>
+      <div class="shoot-time">&#x23F1; 約 2 小時</div>
+      <ul class="shoot-items">
+        <li>郊山步道父子走路</li>
+        <li>父子採訪對談（草地坐著）</li>
+        <li>夕陽背影 / 散步長鏡頭</li>
+      </ul>
+      <div class="shoot-equip">
+        <span class="equip-tag">Pocket</span>
+        <span class="equip-tag">空拍機</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ASSET CHECKLIST ═══ -->
+<div class="asset-section">
+  <div class="section-title">ASSET CHECKLIST</div>
+
+  <div class="asset-group-title">A-ROLL</div>
+  <div class="asset-grid">
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">全部口述段落（7段）</span><span class="asset-pri must">MUST</span></div>
+  </div>
+
+  <div class="asset-group-title">B-ROLL: SHOOT 2 — 騎車串公園</div>
+  <div class="asset-grid">
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">畫騎乘地圖（桌面特寫）</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">騎車出發（街道/河濱）</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">抵達公園 → 下車</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">Monkey Bar 關卡</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">跳格子</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">單槓 / 攀爬</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">60m 衝刺</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">休息喝水 → 上車</span><span class="asset-pri must">MUST</span></div>
+  </div>
+
+  <div class="asset-group-title">B-ROLL: 其他場次</div>
+  <div class="asset-grid">
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">操場跑步 → 喘氣恢復</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">游泳訓練（潛水/翻滾）</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">健行步道（父子走路）</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">夕陽父子散步背影</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">父子對談採訪</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">7 歲比賽素材（游泳/單車/跑步/衝線）</span><span class="asset-pri must">MUST</span></div>
+  </div>
+
+  <div class="asset-group-title">GRAPHICS / AI</div>
+  <div class="asset-grid">
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">數據圖卡：無氧/有氧比</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">圖卡：PFK 酵素 / 代謝死胡同</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">新聞摘要文字卡</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">AI: 生長板軟糖概念圖</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">AI: 大腦神經修剪動畫</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">AI: 油電車 vs 汽油車</span><span class="asset-pri nice">NICE</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">AI: 騎車串公園冒險地圖</span><span class="asset-pri nice">NICE</span></div>
+  </div>
+
+  <div class="asset-group-title">PROPS</div>
+  <div class="asset-grid">
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">手繪騎乘地圖（跟兒子一起畫）</span><span class="asset-pri must">MUST</span></div>
+    <div class="asset-item" onclick="this.classList.toggle('checked')"><div class="asset-check">&#x2713;</div><span class="asset-name">腳踏車 x 2</span><span class="asset-pri must">MUST</span></div>
+  </div>
+</div>
+
+<!-- ═══ TITLE CANDIDATES ═══ -->
+<div class="titles-section">
+  <div class="section-title">TITLE CANDIDATES</div>
+  <div class="title-card"><span class="title-rank">1</span><span class="title-text">帶兒子練三鐵才發現：小孩的身體根本是不同物種</span><span class="title-strat">認知缺口+故事</span></div>
+  <div class="title-card"><span class="title-rank">2</span><span class="title-text">體能教練爸爸的血淚教訓｜別再把小孩當縮小版大人練</span><span class="title-strat">損失框架</span></div>
+  <div class="title-card"><span class="title-rank">3</span><span class="title-text">7歲三鐵小選手的身體秘密｜為什麼他的訓練跟大人完全不同？</span><span class="title-strat">好奇+反常識</span></div>
+  <div class="title-card"><span class="title-rank">4</span><span class="title-text">小孩心跳200是正常的！99%家長不知道的兒童運動真相</span><span class="title-strat">數字錨定</span></div>
+  <div class="title-card"><span class="title-rank">5</span><span class="title-text">小孩的骨頭是軟糖做的？三鐵教練帶你看懂兒童運動生理</span><span class="title-strat">反常識+專業</span></div>
+  <div class="title-card"><span class="title-rank">6</span><span class="title-text">為什麼你家小孩的體力像奧運選手？兒童體適能的驚人真相</span><span class="title-strat">好奇+認知缺口</span></div>
+  <div class="title-card"><span class="title-rank">7</span><span class="title-text">騎車串公園就是最強兒童訓練｜三鐵教練爸爸的私房菜單</span><span class="title-strat">實用價值</span></div>
+  <div class="title-card"><span class="title-rank">8</span><span class="title-text">讓小孩跑全馬？醫生說母湯！兒童運動該這樣練才對</span><span class="title-strat">時事+損失框架</span></div>
+</div>
+
+<!-- ═══ PUBLISH TIMELINE ═══ -->
+<div class="publish-section">
+  <div class="section-title">PUBLISH SCHEDULE</div>
+  <div class="pub-timeline">
+
+    <div class="pub-item">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D-2</span>
+      <div class="pub-content">
+        <div class="pub-platform ig">IG STORY</div>
+        <div class="pub-desc">投票：「小孩心跳 200 正不正常？」+ 問答框：「你家小孩最愛哪個公園？」</div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D-1</span>
+      <div class="pub-content">
+        <div class="pub-platform ig">IG STORY</div>
+        <div class="pub-desc">倒數貼紙：「小孩的身體跟大人完全不同。明天揭曉」</div>
+      </div>
+    </div>
+
+    <div class="pub-item active">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D-Day</span>
+      <div class="pub-content">
+        <div class="pub-platform yt">YOUTUBE 09:00</div>
+        <div class="pub-desc">長片首播 7:15</div>
+      </div>
+    </div>
+
+    <div class="pub-item active">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D-Day</span>
+      <div class="pub-content">
+        <div class="pub-platform ig">IG REELS + <span class="pub-platform fb" style="display:inline;">FB</span> 10:00</div>
+        <div class="pub-desc">60s 精華版 + 斷行詩體貼文</div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D+3</span>
+      <div class="pub-content">
+        <div class="pub-platform ig">IG CAROUSEL</div>
+        <div class="pub-desc">「兒童運動 3 大真相」圖文系列（5 張）</div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-dot"></div>
+      <span class="pub-day">D+7</span>
+      <div class="pub-content">
+        <div class="pub-platform yt">YOUTUBE 社群</div>
+        <div class="pub-desc">成效分享 + 下集預告</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ EDITOR NOTES ═══ -->
+<div class="shoot-section">
+  <div class="section-title">EDITOR NOTES</div>
+  <div class="shoot-grid" style="grid-template-columns: 1fr 1fr;">
+
+    <div class="shoot-card sh1">
+      <div class="shoot-title" style="font-size:14px;">配樂情緒對照</div>
+      <ul class="shoot-items">
+        <li><strong style="color:#aaa;">預告鉤子</strong> — 衝擊音效 x3</li>
+        <li><strong style="color:#aaa;">開場</strong> — 輕快 → 轉嚴肅</li>
+        <li><strong style="color:#aaa;">有氧怪獸</strong> — 好奇感 → 凝重</li>
+        <li><strong style="color:#aaa;">軟糖 x 大腦</strong> — 警示 → 好奇</li>
+        <li><strong style="color:#aaa;">玩出三鐵力</strong> — 輕快冒險（節拍明快）</li>
+        <li><strong style="color:#aaa;">比賽剪影</strong> — 鋼琴+弦樂漸入</li>
+        <li><strong style="color:#aaa;">收尾</strong> — 鋼琴溫暖漸弱</li>
+      </ul>
+    </div>
+
+    <div class="shoot-card sh2">
+      <div class="shoot-title" style="font-size:14px;">特別注意</div>
+      <ul class="shoot-items">
+        <li><strong style="color:#c084fc;">[4] 是全片視覺核心</strong>——剪出「冒險出發」的節奏感</li>
+        <li><strong style="color:#ff6b6b;">全馬新聞</strong>——用文字摘要卡，不直接用新聞影片（版權）</li>
+        <li><strong style="color:#34d399;">父子採訪</strong>——保留停頓、笑場。真實感 > 流暢度</li>
+        <li><strong style="color:#fbbf24;">收尾詩體</strong>——每句之間留 1-1.5s 空白，配樂不蓋聲音</li>
+        <li>轉場以 cut 為主，段落間可用 0.3s 短黑屏</li>
+        <li>每 45-60 秒至少一次節奏切換（B-Roll/圖卡/場景）</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  菜逼爸教練 &copy; 2026 &middot; 企劃看板由 Claude 生成 &middot;
+  <a href="https://www.youtube.com/@NewbieNoobie1" target="_blank">youtube.com/@NewbieNoobie1</a>
+</div>
+
+</body>
+</html>
