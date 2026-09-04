@@ -1,0 +1,9 @@
+name = "youth-training-passport"
+pages_build_output_dir = "public"
+compatibility_date = "2026-08-31"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "youth-training-passport-db"
+database_id = "315c9a40-e61f-4fd5-b994-8fa0a72a8755"

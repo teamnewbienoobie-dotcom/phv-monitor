@@ -1,0 +1,546 @@
+<title>訓練護照</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+  :root{
+    color-scheme: light;
+    --bg:            #F4F8F6;
+    --bg-weave:      #EAF1EE;
+    --surface:       #FFFFFF;
+    --surface-2:     #EEF3F1;
+    --ink:           #101A17;
+    --ink-secondary: #4C5A56;
+    --ink-muted:     #869390;
+    --border:        rgba(16,26,23,0.12);
+    --border-soft:   rgba(16,26,23,0.07);
+
+    --accent:        #4A3AA7;
+    --accent-strong: #382C82;
+    --accent-ink:    #FFFFFF;
+    --accent-soft:   #EDE9F9;
+
+    --cat-foundation: #2A78D6;
+    --cat-strength:   #EB6834;
+    --cat-agility:    #1BAF7A;
+    --cat-power:      #EDA100;
+    --cat-recovery:   #E87BA4;
+
+    --good: #0CA30C;
+
+    --shadow-card: 0 1px 2px rgba(16,26,23,.05), 0 14px 32px -18px rgba(16,26,23,.28);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg:            #0D1715;
+      --bg-weave:      #101E1B;
+      --surface:       #172423;
+      --surface-2:     #1D2C2A;
+      --ink:           #F2F7F5;
+      --ink-secondary: #B7C6C2;
+      --ink-muted:     #7C8B87;
+      --border:        rgba(255,255,255,0.12);
+      --border-soft:   rgba(255,255,255,0.07);
+
+      --accent:        #9085E9;
+      --accent-strong: #ABA2EF;
+      --accent-ink:    #171226;
+      --accent-soft:   #241E3D;
+
+      --cat-foundation: #3987E5;
+      --cat-strength:   #D95926;
+      --cat-agility:    #199E70;
+      --cat-power:      #C98500;
+      --cat-recovery:   #D55181;
+
+      --good: #0CA30C;
+
+      --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg:            #0D1715;
+    --bg-weave:      #101E1B;
+    --surface:       #172423;
+    --surface-2:     #1D2C2A;
+    --ink:           #F2F7F5;
+    --ink-secondary: #B7C6C2;
+    --ink-muted:     #7C8B87;
+    --border:        rgba(255,255,255,0.12);
+    --border-soft:   rgba(255,255,255,0.07);
+
+    --accent:        #9085E9;
+    --accent-strong: #ABA2EF;
+    --accent-ink:    #171226;
+    --accent-soft:   #241E3D;
+
+    --cat-foundation: #3987E5;
+    --cat-strength:   #D95926;
+    --cat-agility:    #199E70;
+    --cat-power:      #C98500;
+    --cat-recovery:   #D55181;
+
+    --good: #0CA30C;
+
+    --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(0,0,0,.6);
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, var(--bg-weave) 1px, transparent 0);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: 'Noto Sans TC', system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  h1,h2,h3{ text-wrap: balance; margin: 0; }
+  .num{ font-family: 'Big Shoulders Display','Noto Sans TC',system-ui,sans-serif; font-variant-numeric: tabular-nums; }
+
+  .page{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 18px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ---------- header ---------- */
+  .header{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 6px 4px 2px;
+  }
+  .avatar{
+    flex: none;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    color: var(--accent-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Big Shoulders Display'; font-weight: 900; font-size: 26px;
+  }
+  .header-text{ flex: 1; min-width: 0; }
+  .eyebrow{
+    font-size: 11.5px; font-weight: 700; letter-spacing: .08em;
+    color: var(--accent-strong); text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .header-name{
+    font-family: 'Big Shoulders Display'; font-weight: 900;
+    font-size: 34px; line-height: 1.05; margin-top: 2px;
+  }
+  .header-sub{ font-size: 13px; color: var(--ink-secondary); margin-top: 2px; }
+
+  .coach-toggle{
+    flex: none;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .coach-toggle:hover{ border-color: var(--accent); color: var(--accent-strong); }
+  .coach-toggle svg{ width: 14px; height: 14px; }
+  .coach-toggle.unlocked{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+
+  .coach-panel{
+    display: none;
+    align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md, 14px);
+    background: var(--accent-soft);
+    border: 1px dashed var(--accent);
+    font-size: 12.5px; color: var(--accent-strong);
+  }
+  .coach-panel.show{ display: flex; }
+  .coach-panel .add-btn{
+    flex: none;
+    border: none; border-radius: 999px;
+    background: var(--accent); color: var(--accent-ink);
+    font-size: 12.5px; font-weight: 700;
+    padding: 7px 12px; cursor: pointer;
+  }
+
+  /* ---------- card shell ---------- */
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+  .card-pad{ padding: 20px 20px 22px; }
+  .section-head{
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; margin-bottom: 14px;
+  }
+  .section-title{ font-size: 15px; font-weight: 700; }
+  .section-meta{ font-size: 12.5px; color: var(--ink-muted); }
+
+  /* ---------- mesocycle ticket ---------- */
+  .ticket{ display: flex; }
+  .ticket-stub{
+    flex: none;
+    width: 84px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+    position: relative;
+  }
+  .ticket-stub::after{
+    content: "";
+    position: absolute; right: -1px; top: 0; bottom: 0; width: 0;
+    border-right: 2px dashed rgba(255,255,255,.55);
+  }
+  .ticket-stub .chapter-no{
+    font-family: 'Big Shoulders Display'; font-weight: 900; font-size: 30px; line-height: 1;
+  }
+  .ticket-stub .chapter-label{ font-size: 10.5px; letter-spacing: .06em; opacity: .85; }
+  .ticket-main{ flex: 1; padding: 18px 20px; min-width: 0; }
+  .ticket-title{ font-size: 20px; font-weight: 700; }
+  .ticket-goal{
+    margin-top: 8px; font-size: 13.5px; line-height: 1.65; color: var(--ink-secondary);
+  }
+
+  .week-dots{ display: flex; align-items: center; gap: 6px; margin-top: 14px; }
+  .week-dots .dot{
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--surface-2); border: 1.5px solid var(--border);
+  }
+  .week-dots .dot.filled{ background: var(--accent); border-color: var(--accent); }
+  .week-dots .label{ margin-left: 6px; font-size: 12px; color: var(--ink-muted); }
+
+  .next-strip{
+    margin-top: 14px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    color: var(--ink-muted);
+    font-size: 12.5px;
+  }
+  .next-strip b{ color: var(--ink-secondary); font-weight: 700; }
+  .next-strip svg{ width: 14px; height: 14px; flex: none; }
+
+  /* ---------- badges ---------- */
+  .badge-row{
+    display: flex; gap: 16px; overflow-x: auto; padding: 4px 2px 8px;
+  }
+  .badge{
+    flex: none; width: 84px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    text-align: center;
+  }
+  .badge-stamp{
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--accent);
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    transform: rotate(var(--tilt, -3deg));
+  }
+  .badge-stamp svg{ width: 28px; height: 28px; }
+  .badge.locked .badge-stamp{
+    border: 2px dashed var(--border);
+    color: var(--ink-muted);
+    background: var(--surface-2);
+    transform: none;
+  }
+  .badge-name{ font-size: 11.5px; line-height: 1.35; color: var(--ink-secondary); }
+  .badge.locked .badge-name{ color: var(--ink-muted); }
+  .badge-sub{ font-size: 10px; color: var(--ink-muted); }
+
+  /* ---------- skill bars ---------- */
+  .skill-row{
+    display: grid;
+    grid-template-columns: 20px 92px 1fr 52px;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+  .skill-row svg{ width: 18px; height: 18px; }
+  .skill-name{ font-size: 13px; font-weight: 500; color: var(--ink-secondary); }
+  .skill-track{
+    height: 14px; border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .skill-fill{
+    height: 100%; border-radius: 999px;
+    width: 0;
+    transition: width .9s cubic-bezier(.2,.7,.25,1);
+  }
+  .skill-value{ font-size: 12.5px; text-align: right; color: var(--ink-secondary); }
+
+  /* ---------- log ---------- */
+  .log-list{ display: flex; flex-direction: column; }
+  .log-entry{
+    padding: 16px 0;
+    border-top: 1px solid var(--border-soft);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .log-entry:first-child{ border-top: none; padding-top: 4px; }
+  .log-top{ display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .log-date{ font-size: 13.5px; font-weight: 700; }
+  .chip{
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 500;
+    border: 1px solid var(--border);
+    color: var(--ink-secondary);
+  }
+  .chip .dot{ width: 6px; height: 6px; border-radius: 50%; }
+  .ex-list{ display: flex; flex-wrap: wrap; gap: 7px; }
+  .ex-chip{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px 5px 8px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    font-size: 12px; color: var(--ink);
+    border-left: 3px solid transparent;
+  }
+  .ex-chip .qty{ color: var(--ink-muted); }
+  .coach-note{
+    font-size: 12.5px; line-height: 1.6; color: var(--ink-secondary);
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border-left: 3px solid var(--accent);
+    font-style: italic;
+  }
+
+  .proto-note{
+    text-align: center; font-size: 11.5px; color: var(--ink-muted);
+    padding: 6px 12px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .skill-fill{ transition: none; }
+  }
+
+  @media (max-width: 420px){
+    .header-name{ font-size: 28px; }
+    .skill-row{ grid-template-columns: 18px 74px 1fr 46px; }
+  }
+</style>
+
+<div class="page">
+
+  <!-- header -->
+  <div class="header">
+    <div class="avatar">翔</div>
+    <div class="header-text">
+      <div class="eyebrow">訓練護照 · YPD 週期化課表</div>
+      <h1 class="header-name">小翔</h1>
+      <div class="header-sub">體能發展計畫 · 累計第 14 週</div>
+    </div>
+    <button class="coach-toggle" id="coachToggle" type="button" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <span id="coachToggleLabel">教練模式</span>
+    </button>
+  </div>
+
+  <div class="coach-panel" id="coachPanel">
+    <span>✓ 已解鎖編輯權限（原型示範，未串接密碼驗證）</span>
+    <button class="add-btn" type="button">＋ 新增訓練紀錄</button>
+  </div>
+
+  <!-- current mesocycle -->
+  <div class="card">
+    <div class="ticket">
+      <div class="ticket-stub">
+        <div class="chapter-no num">03</div>
+        <div class="chapter-label">CHAPTER</div>
+      </div>
+      <div class="ticket-main">
+        <div class="ticket-title">肌力發展期</div>
+        <p class="ticket-goal">建立蹲舉、硬舉基礎動作模式，強化核心穩定度，為下一階段的爆發力訓練打好地基。</p>
+        <div class="week-dots" aria-label="第 3 週，共 5 週">
+          <span class="dot filled"></span>
+          <span class="dot filled"></span>
+          <span class="dot filled"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="label num">第 3 / 5 週</span>
+        </div>
+        <div class="next-strip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          下一章：<b>爆發力啟動期</b>　約 2 週後開始
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- badges -->
+  <div class="card card-pad">
+    <div class="section-head">
+      <div class="section-title">收藏印章</div>
+      <div class="section-meta">已解鎖 3 / 5</div>
+    </div>
+    <div class="badge-row">
+      <div class="badge" style="--tilt:-4deg">
+        <div class="badge-stamp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c2-6 4-9 8-9s6 3 8 9"/><circle cx="12" cy="7" r="3"/></svg>
+        </div>
+        <div class="badge-name">基礎動作達人</div>
+        <div class="badge-sub">累積 10 小時</div>
+      </div>
+      <div class="badge" style="--tilt:3deg">
+        <div class="badge-stamp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/><path d="M8.4 12h7.2"/></svg>
+        </div>
+        <div class="badge-name">肌力新手</div>
+        <div class="badge-sub">首次負重訓練</div>
+      </div>
+      <div class="badge" style="--tilt:-2deg">
+        <div class="badge-stamp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="M6 15l4-5 3 3 5-7"/></svg>
+        </div>
+        <div class="badge-name">連續 4 週<br>不缺席</div>
+        <div class="badge-sub">出席穩定</div>
+      </div>
+      <div class="badge locked">
+        <div class="badge-stamp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M12 3l4 3M12 3L8 6M6 12l3 1M18 12l-3 1M12 21c4-2 6-5 6-9"/></svg>
+        </div>
+        <div class="badge-name">爆發力覺醒</div>
+        <div class="badge-sub">累積 10 小時</div>
+      </div>
+      <div class="badge locked">
+        <div class="badge-stamp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7.5 21 12 18.5 16.5 21 15 13.5"/></svg>
+        </div>
+        <div class="badge-name">半年鐵人</div>
+        <div class="badge-sub">累積 6 個月</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- skill distribution -->
+  <div class="card card-pad">
+    <div class="section-head">
+      <div class="section-title">累積訓練分佈</div>
+      <div class="section-meta num">共 38.0 小時</div>
+    </div>
+
+    <div class="skill-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-foundation)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c2-6 4-9 8-9s6 3 8 9"/><circle cx="12" cy="7" r="3"/></svg>
+      <div class="skill-name">基礎動作</div>
+      <div class="skill-track"><div class="skill-fill" data-width="100%" style="background:var(--cat-foundation)"></div></div>
+      <div class="skill-value num">12.5h</div>
+    </div>
+    <div class="skill-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-strength)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/><path d="M8.4 12h7.2"/></svg>
+      <div class="skill-name">肌力</div>
+      <div class="skill-track"><div class="skill-fill" data-width="72%" style="background:var(--cat-strength)"></div></div>
+      <div class="skill-value num">9.0h</div>
+    </div>
+    <div class="skill-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-agility)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h4l2-4 3 8 2-4h3"/></svg>
+      <div class="skill-name">速度與敏捷</div>
+      <div class="skill-track"><div class="skill-fill" data-width="60%" style="background:var(--cat-agility)"></div></div>
+      <div class="skill-value num">7.5h</div>
+    </div>
+    <div class="skill-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-power)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L6 14h5l-1 7 7-11h-5z"/></svg>
+      <div class="skill-name">爆發力</div>
+      <div class="skill-track"><div class="skill-fill" data-width="32%" style="background:var(--cat-power)"></div></div>
+      <div class="skill-value num">4.0h</div>
+    </div>
+    <div class="skill-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-recovery)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-4-6.9"/><path d="M20 4v4h-4"/></svg>
+      <div class="skill-name">體能恢復</div>
+      <div class="skill-track"><div class="skill-fill" data-width="40%" style="background:var(--cat-recovery)"></div></div>
+      <div class="skill-value num">5.0h</div>
+    </div>
+  </div>
+
+  <!-- training log -->
+  <div class="card card-pad">
+    <div class="section-head">
+      <div class="section-title">訓練紀錄</div>
+      <div class="section-meta">最近 3 堂</div>
+    </div>
+    <div class="log-list">
+
+      <div class="log-entry">
+        <div class="log-top">
+          <div class="log-date">8/28（五）</div>
+          <span class="chip"><span class="dot" style="background:var(--good)"></span>sRPE 6/10</span>
+          <span class="chip">45 分鐘</span>
+        </div>
+        <div class="ex-list">
+          <span class="ex-chip" style="border-left-color:var(--cat-strength)">高腳杯蹲 <span class="qty">3×8</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-strength)">農夫走路 <span class="qty">3 趟</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-agility)">敏捷梯 <span class="qty">10 分鐘</span></span>
+        </div>
+        <div class="coach-note">蹲姿深度進步很多，膝蓋不再內夾了。</div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-top">
+          <div class="log-date">8/25（二）</div>
+          <span class="chip"><span class="dot" style="background:var(--cat-power)"></span>sRPE 7/10</span>
+          <span class="chip">40 分鐘</span>
+        </div>
+        <div class="ex-list">
+          <span class="ex-chip" style="border-left-color:var(--cat-power)">跳箱 <span class="qty">4×5</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-agility)">側併步 <span class="qty">3×20m</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-foundation)">核心棒式 <span class="qty">3×30s</span></span>
+        </div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-top">
+          <div class="log-date">8/21（五）</div>
+          <span class="chip"><span class="dot" style="background:var(--good)"></span>sRPE 5/10</span>
+          <span class="chip">35 分鐘</span>
+        </div>
+        <div class="ex-list">
+          <span class="ex-chip" style="border-left-color:var(--cat-foundation)">動物爬行 <span class="qty">10 分鐘</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-strength)">彈力帶划船 <span class="qty">3×12</span></span>
+          <span class="ex-chip" style="border-left-color:var(--cat-recovery)">動態伸展 <span class="qty">10 分鐘</span></span>
+        </div>
+        <div class="coach-note">今天精神很好，動作品質很穩定。</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="proto-note">原型畫面 · 資料為示範內容，尚未連接資料庫</div>
+
+</div>
+
+<script>
+  (function(){
+    var bars = document.querySelectorAll('.skill-fill');
+    requestAnimationFrame(function(){
+      setTimeout(function(){
+        bars.forEach(function(b){ b.style.width = b.getAttribute('data-width'); });
+      }, 80);
+    });
+
+    var toggle = document.getElementById('coachToggle');
+    var panel = document.getElementById('coachPanel');
+    var label = document.getElementById('coachToggleLabel');
+    var unlocked = false;
+    toggle.addEventListener('click', function(){
+      unlocked = !unlocked;
+      toggle.classList.toggle('unlocked', unlocked);
+      toggle.setAttribute('aria-pressed', String(unlocked));
+      panel.classList.toggle('show', unlocked);
+      label.textContent = unlocked ? '編輯中' : '教練模式';
+    });
+  })();
+</script>

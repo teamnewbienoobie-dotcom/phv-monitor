@@ -1,0 +1,15 @@
+[
+  {
+    "date": "2026-09-04",
+    "scope": "app",
+    "macrostructure": "Map / Diagram",
+    "genre": "editorial",
+    "theme": "Almanac",
+    "theme_axes": "light paper / display-condensed / cool accent (indigo 286)",
+    "nav": "N6 Newspaper masthead (left-flush variant)",
+    "footer": "Ft4 Dense colophon",
+    "enrichment": "none",
+    "mood": "護照／年鑑",
+    "brief": "訓練護照 — 兒少體能訓練紀錄 App，redesign after audit (3 critical / 11 major / 5 minor)"
+  }
+]

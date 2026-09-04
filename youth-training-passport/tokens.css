@@ -1,0 +1,182 @@
+/* Hallmark · genre: editorial · macrostructure: Map / Diagram · theme: Almanac
+ * nav: N6 Newspaper masthead (left-flush variant · issue-line above · wordmark 2xl · double rule)
+ * footer: Ft4 Dense colophon · enrichment: none (typography only) · designed-as-app
+ * tone: 護照／年鑑 · anchor hue: 165 (green) · accent hue: 286 (indigo)
+ * pre-emit critique: P5 H4 E4 S5 R4 V4
+ * contrast: pass (40–41) · icons: pass (30) · tokens: pass (48)
+ * chrome: pass (47) · honest: pass (46) · mobile: pass (34, 49, 50–57)
+ *
+ * Type: display Big Shoulders · body Noto Sans TC · outlier JetBrains Mono
+ *   outlier 只服務一個角色：可轉錄的識別碼（護照 ID、ID 輸入欄、週次代碼）。
+ *
+ * Design position: 「卡片＝可以改的東西，版面＝已經發生的紀錄」
+ * .card  → 編輯面（表單、教練工具、彈窗）有框、有影、可觸碰
+ * .folio → 紀錄面（塔、進度、課表、成長）只有髮絲線，像護照內頁
+ */
+/* tokens.css — 訓練護照的可攜設計 token。
+ * index.html 的 <style> 是這份的內嵌副本；改這裡要一起改。
+ * 規則：畫面上任何顏色與字體都必須走 var(--token)，不可以寫死 hex 或 font-family。
+ */
+
+:root{
+  color-scheme: light;
+
+  /* ---- paper & ink (anchor hue 165) ---- */
+  --paper:        oklch(97.2% 0.008 165);
+  --paper-weave:  oklch(95.4% 0.011 165);
+  --surface:      oklch(99.2% 0.004 165);   /* 不是純白 */
+  --surface-2:    oklch(95.6% 0.009 165);
+  --surface-3:    oklch(93.2% 0.011 165);
+  --ink:          oklch(21% 0.020 168);
+  --ink-2:        oklch(44% 0.016 168);
+  --ink-3:        oklch(47% 0.014 168);     /* muted — 已驗過 4.5:1 */
+  --rule:         oklch(21% 0.020 168 / .14);
+  --rule-soft:    oklch(21% 0.020 168 / .08);
+
+  /* ---- accent (indigo 286) ---- */
+  --accent:        oklch(41% 0.165 286);
+  --accent-strong: oklch(34% 0.150 286);
+  --accent-ink:    oklch(99.2% 0.004 165);
+  --accent-soft:   oklch(94% 0.030 286);
+  --focus:         oklch(48% 0.180 286);
+
+  /* ---- 七元素：solid 給圖塊與點，deep 給文字，soft 給底 ---- */
+  --c-fms:           oklch(56% 0.150 258);
+  --c-fms-deep:      oklch(40% 0.130 258);
+  --c-fms-on:        oklch(99% 0.004 165);
+  --c-strength:      oklch(56% 0.170 30);
+  --c-strength-deep: oklch(40% 0.145 30);
+  --c-strength-on:   oklch(99% 0.004 165);
+  --c-power:         oklch(70% 0.150 75);
+  --c-power-deep:    oklch(45% 0.110 65);
+  --c-power-on:      oklch(20% 0.040 75);   /* 琥珀色配深墨，不配白 */
+  --c-plyo:          oklch(47% 0.180 295);
+  --c-plyo-deep:     oklch(38% 0.160 295);
+  --c-plyo-on:       oklch(99% 0.004 165);
+  --c-saq:           oklch(58% 0.120 163);
+  --c-saq-deep:      oklch(42% 0.100 163);
+  --c-saq-on:        oklch(99% 0.004 165);
+  --c-energy:        oklch(52% 0.110 55);
+  --c-energy-deep:   oklch(40% 0.095 55);
+  --c-energy-on:     oklch(99% 0.004 165);
+  --c-mobility:      oklch(58% 0.170 350);
+  --c-mobility-deep: oklch(43% 0.150 350);
+  --c-mobility-on:   oklch(99% 0.004 165);
+
+  --gold:   oklch(78% 0.145 88);
+  --silver: oklch(72% 0.020 250);
+
+  --good:      oklch(48% 0.130 150);
+  --good-soft: oklch(94% 0.035 150);
+  --warn:      oklch(50% 0.110 70);
+  --warn-soft: oklch(94% 0.040 80);
+  --bad:       oklch(50% 0.180 27);
+  --bad-soft:  oklch(94% 0.035 27);
+
+  /* ---- type ---- */
+  --font-display: 'Big Shoulders Display', 'Noto Sans TC', system-ui, sans-serif;
+  --font-body:    'Noto Sans TC', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* outlier 只有兩個位置：護照 ID 本身、以及輸入 ID 的欄位。2+1 規則的 outlier ≤ 2 slots。 */
+  --font-outlier: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Noto Sans TC', monospace;
+
+  --text-2xs:  0.6875rem;  /* 11 */
+  --text-xs:   0.75rem;    /* 12 */
+  --text-sm:   0.8125rem;  /* 13 */
+  --text-md:   0.9375rem;  /* 15 — base */
+  --text-lg:   1.0625rem;  /* 17 */
+  --text-xl:   1.375rem;   /* 22 */
+  --text-2xl:  1.75rem;    /* 28 */
+  --text-3xl:  2.25rem;    /* 36 */
+  --text-mast: clamp(2.5rem, 11vw, 3.5rem);
+
+  --lh-display: 1.02;
+  --lh-tight:   1.2;
+  --lh-body:    1.6;
+
+  /* ---- 4pt space scale ---- */
+  --space-3xs: 0.125rem;  --space-2xs: 0.25rem;  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;   --space-md:  1rem;     --space-lg:  1.5rem;
+  --space-xl:  2.5rem;    --space-2xl: 4rem;     --space-3xl: 6rem;
+
+  --gutter:   var(--space-md);
+  --page-max: 44rem;
+
+  /* ---- rules, radius, elevation ---- */
+  --rule-hair: 1px;
+  --radius-sm: 6px;  --radius-md: 10px;  --radius-lg: 14px;  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px oklch(21% 0.02 168 / .05), 0 10px 26px -18px oklch(21% 0.02 168 / .28);
+
+  /* ---- motion ---- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;  --dur-short: 220ms;  --dur-long: 420ms;
+
+  /* ---- z scale ---- */
+  --z-base: 1;  --z-raised: 10;  --z-dropdown: 100;
+  --z-sticky: 200;  --z-sticky-nav: 300;  --z-modal: 400;  --z-toast: 500;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme: dark;
+    --paper:        oklch(16% 0.014 165);
+    --paper-weave:  oklch(19% 0.016 165);
+    --surface:      oklch(21% 0.016 165);
+    --surface-2:    oklch(25% 0.016 165);
+    --surface-3:    oklch(29% 0.016 165);
+    --ink:          oklch(94% 0.008 165);
+    --ink-2:        oklch(78% 0.012 165);
+    --ink-3:        oklch(72% 0.012 165);
+    --rule:         oklch(94% 0.008 165 / .16);
+    --rule-soft:    oklch(94% 0.008 165 / .09);
+    --accent:        oklch(74% 0.135 286);
+    --accent-strong: oklch(82% 0.115 286);
+    --accent-ink:    oklch(18% 0.040 286);
+    --accent-soft:   oklch(30% 0.060 286);
+    --focus:         oklch(78% 0.140 286);
+    --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
+    --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
+    --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);
+    --c-plyo:          oklch(62% 0.155 295);  --c-plyo-deep:     oklch(80% 0.115 295);  --c-plyo-on:     oklch(16% 0.030 295);
+    --c-saq:           oklch(66% 0.115 163);  --c-saq-deep:      oklch(82% 0.090 163);  --c-saq-on:      oklch(16% 0.030 163);
+    --c-energy:        oklch(62% 0.100 55);   --c-energy-deep:   oklch(80% 0.085 55);   --c-energy-on:   oklch(16% 0.030 55);
+    --c-mobility:      oklch(66% 0.150 350);  --c-mobility-deep: oklch(82% 0.105 350);  --c-mobility-on: oklch(16% 0.030 350);
+    --gold:   oklch(80% 0.135 88);
+    --silver: oklch(76% 0.020 250);
+    --good:      oklch(76% 0.135 150);  --good-soft: oklch(28% 0.055 150);
+    --warn:      oklch(80% 0.110 80);   --warn-soft: oklch(29% 0.050 80);
+    --bad:       oklch(72% 0.150 27);   --bad-soft:  oklch(28% 0.060 27);
+    --shadow-card: 0 1px 2px oklch(0% 0 0 / .34), 0 12px 30px -20px oklch(0% 0 0 / .62);
+  }
+}
+
+:root[data-theme="dark"]{ color-scheme: dark;
+  --paper:        oklch(16% 0.014 165);
+  --paper-weave:  oklch(19% 0.016 165);
+  --surface:      oklch(21% 0.016 165);
+  --surface-2:    oklch(25% 0.016 165);
+  --surface-3:    oklch(29% 0.016 165);
+  --ink:          oklch(94% 0.008 165);
+  --ink-2:        oklch(78% 0.012 165);
+  --ink-3:        oklch(72% 0.012 165);
+  --rule:         oklch(94% 0.008 165 / .16);
+  --rule-soft:    oklch(94% 0.008 165 / .09);
+  --accent:        oklch(74% 0.135 286);
+  --accent-strong: oklch(82% 0.115 286);
+  --accent-ink:    oklch(18% 0.040 286);
+  --accent-soft:   oklch(30% 0.060 286);
+  --focus:         oklch(78% 0.140 286);
+  --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
+  --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
+  --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);
+  --c-plyo:          oklch(62% 0.155 295);  --c-plyo-deep:     oklch(80% 0.115 295);  --c-plyo-on:     oklch(16% 0.030 295);
+  --c-saq:           oklch(66% 0.115 163);  --c-saq-deep:      oklch(82% 0.090 163);  --c-saq-on:      oklch(16% 0.030 163);
+  --c-energy:        oklch(62% 0.100 55);   --c-energy-deep:   oklch(80% 0.085 55);   --c-energy-on:   oklch(16% 0.030 55);
+  --c-mobility:      oklch(66% 0.150 350);  --c-mobility-deep: oklch(82% 0.105 350);  --c-mobility-on: oklch(16% 0.030 350);
+  --gold:   oklch(80% 0.135 88);
+  --silver: oklch(76% 0.020 250);
+  --good:      oklch(76% 0.135 150);  --good-soft: oklch(28% 0.055 150);
+  --warn:      oklch(80% 0.110 80);   --warn-soft: oklch(29% 0.050 80);
+  --bad:       oklch(72% 0.150 27);   --bad-soft:  oklch(28% 0.060 27);
+  --shadow-card: 0 1px 2px oklch(0% 0 0 / .34), 0 12px 30px -20px oklch(0% 0 0 / .62);
+}

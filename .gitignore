@@ -6,3 +6,9 @@ brainstorm-mockup.html
 brainstorm-q1.png
 brainstorm-q2.png
 brainstorm-q3.png
+
+# 訓練護照：本機設定與建置產物，不進版控（含 API 金鑰）
+youth-training-passport/.dev.vars
+youth-training-passport/.wrangler/
+youth-training-passport/wrangler-dev.log
+youth-training-passport/pp-tmp.json
