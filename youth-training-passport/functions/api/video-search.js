@@ -7,7 +7,7 @@
  * 規則（教練定的）：影片必須 < 3 分鐘；成人示範可以接受。
  * 只存影片 ID，縮圖與播放都用 YouTube 官方網址，不下載影片、不自行截圖。
  */
-import { json, parseJson, ytDuration, CATEGORIES, CAT_LABEL, SEG_META } from '../_shared/model.js';
+import { json, parseJson, ytDuration, parseYouTube, CATEGORIES, CAT_LABEL, SEG_META } from '../_shared/model.js';
 import { requireAuth } from '../_shared/verify.js';
 
 const SEG_LABEL = Object.fromEntries(Object.entries(SEG_META).map(([k, v]) => [k, `${v.letter} ${v.label}（${v.zh}）`]));
@@ -89,6 +89,52 @@ async function searchOne(key, name, category, overrideQuery) {
 }
 
 const fmtDur = s => (s == null ? '?' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`);
+
+/** 把一串影片 ID 補上標題／時長／觀看數。videos.list 一次最多 50 個、只花 1 單位 */
+async function hydrate(key, ids) {
+  if (!ids.length) return [];
+  const vu = new URL('https://www.googleapis.com/youtube/v3/videos');
+  vu.search = new URLSearchParams({ key, part: 'snippet,contentDetails,statistics,status', id: ids.slice(0, 50).join(',') }).toString();
+  const vr = await fetch(vu);
+  if (!vr.ok) throw new Error(`YouTube 取影片資訊失敗（HTTP ${vr.status}）${(await vr.text()).slice(0, 140)}`);
+  const vj = await vr.json();
+  return (vj.items || [])
+    .filter(v => v.status?.embeddable !== false)     // 不能嵌入的就別選了
+    .map(v => ({
+      id: v.id,
+      title: v.snippet?.title || '',
+      channel: v.snippet?.channelTitle || '',
+      seconds: ytDuration(v.contentDetails?.duration),
+      views: Number(v.statistics?.viewCount || 0),
+    }));
+}
+
+/**
+ * 走一般網頁搜尋找 YouTube 網址，再用 videos.list 補資料。
+ * YouTube 的 search.list 每次要 100 單位，這條路只花 1 單位，額度用完時的主力。
+ */
+async function searchViaWeb(env, name, category, overrideQuery) {
+  const base = overrideQuery ? String(overrideQuery).trim().slice(0, 120) : buildQuery(name, category);
+  const q = `site:youtube.com ${base}`;
+  const r = await fetch('https://api.firecrawl.dev/v2/search', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.FIRECRAWL_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: q, limit: 10 }),
+  });
+  if (!r.ok) throw new Error(`網頁搜尋失敗（HTTP ${r.status}）${(await r.text()).slice(0, 140)}`);
+  const j = await r.json();
+  const ids = [];
+  for (const w of (j.data?.web || [])) {
+    const id = parseYouTube(w.url);
+    if (id && !ids.includes(id)) ids.push(id);
+  }
+  if (!ids.length) return { query: q, candidates: [], dropped_long: 0 };
+  const cands = await hydrate(env.YOUTUBE_API_KEY, ids);
+  for (const c of cands) c.score = scoreVideo(c, name);
+  const within = cands.filter(c => c.seconds != null && c.seconds <= MAX_SECONDS);
+  within.sort((a, b) => b.score - a.score);
+  return { query: q, candidates: within.slice(0, 8), dropped_long: cands.length - within.length };
+}
 
 /**
  * LLM 從候選裡挑一支並說明理由。挑不到就回 null（寧可空著也不要掛錯影片）。
@@ -177,6 +223,7 @@ export async function onRequest({ request, env }) {
       need_by_category: Object.fromEntries(byCat.map(r => [r.category, r.n])),
       has_key: !!env.YOUTUBE_API_KEY,
       has_llm: !!env.GEMINI_API_KEY,
+      has_web: !!env.FIRECRAWL_API_KEY,
       per_run: MAX_PER_RUN,
       per_day: Math.floor(DAILY_QUOTA_HINT / SEARCH_COST),
     };
@@ -194,6 +241,11 @@ export async function onRequest({ request, env }) {
       const auto = body.auto === true;                       // true = AI 挑完直接上線，不進待審
       const cat = CATEGORIES.includes(body.category) ? body.category : null;
       const retry = body.retry === true;   // 把「找過但沒找到」的再試一次
+      // 搜尋來源：yt = YouTube search.list（每次 100 單位）；web = 一般網頁搜尋 + videos.list（1 單位）
+      const useWeb = body.source === 'web' && !!env.FIRECRAWL_API_KEY;
+      if (body.source === 'web' && !env.FIRECRAWL_API_KEY) {
+        return json({ error: '還沒設定 FIRECRAWL_API_KEY，網頁搜尋來源不能用' }, 400);
+      }
 
       const raw = body.id
         ? (await env.DB.prepare('SELECT id, name, category, segment FROM exercise_catalog WHERE id=?').bind(body.id).all()).results
@@ -230,7 +282,9 @@ export async function onRequest({ request, env }) {
         };
         try {
           searched++;
-          const { candidates, query, dropped_long } = await searchOne(env.YOUTUBE_API_KEY, lead.name, lead.category, body.query);
+          const { candidates, query, dropped_long } = useWeb
+            ? await searchViaWeb(env, lead.name, lead.category, body.query)
+            : await searchOne(env.YOUTUBE_API_KEY, lead.name, lead.category, body.query);
           if (!candidates.length) {
             await markAll(`UPDATE exercise_catalog SET video_status='nomatch', video_alts='[]' WHERE id IN (__IDS__)`);
             skipped.push({ ids, name: names.join('、'), reason: dropped_long ? `只有超過 3 分鐘的（${dropped_long} 支）` : '搜不到影片' });
@@ -273,7 +327,7 @@ export async function onRequest({ request, env }) {
           if (/quota|quotaExceeded|403/i.test(e.message)) { quotaOut = true; break; }
         }
       }
-      return json({ ok: true, auto, category: cat, done, skipped, failed, searched, groups: rows.length, covered: done.reduce((a,x)=>a+x.ids.length,0) + skipped.reduce((a,x)=>a+x.ids.length,0), quota_exhausted: quotaOut });
+      return json({ ok: true, auto, category: cat, source: useWeb ? 'web' : 'yt', done, skipped, failed, searched, groups: rows.length, covered: done.reduce((a,x)=>a+x.ids.length,0) + skipped.reduce((a,x)=>a+x.ids.length,0), quota_exhausted: quotaOut });
     }
     return new Response('Method Not Allowed', { status: 405 });
   } catch (err) {

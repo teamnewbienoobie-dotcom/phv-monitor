@@ -594,7 +594,7 @@ async function libraryPanel(host) {
   LIB = null;
   const lib = await library();
   let q = ''; let scope = 'all'; const sel = new Set(); let editing = null; let onlySug = false;
-  let vScope = ''; let vAuto = false; let vRunning = false; let vFilter = '';   // 找影片的範圍、是否直接上線、是否正在接力跑
+  let vScope = ''; let vAuto = false; let vRunning = false; let vFilter = ''; let vWeb = false;   // 找影片的範圍、是否直接上線、是否正在接力跑
 
   const allItems = () => lib.library.flatMap(g => g.items.map(it => ({ ...it, family: g.family })));
 
@@ -671,14 +671,16 @@ async function libraryPanel(host) {
       <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px">
         <select id="v_scope" style="flex:0 1 12rem"><option value="">全部（${need}）</option>${CATS.filter(c => catNeed[c]).map(c => `<option value="${c}" ${vScope === c ? 'selected' : ''}>${CAT_LABEL[c]}（${catNeed[c]}）</option>`).join('')}</select>
         <label class="vchk"><input type="checkbox" id="v_auto" ${vAuto ? 'checked' : ''}>AI 挑完直接上線</label>
+        ${st.has_web ? `<label class="vchk" title="YouTube 搜尋每次要 100 單位配額；改走網頁搜尋只花 1 單位"><input type="checkbox" id="v_web" ${vWeb ? 'checked' : ''}>省配額模式</label>` : ''}
         <button class="btn sm primary" id="v_run"${targetCount() ? '' : ' disabled'}>${targetCount() ? `開始找（${targetCount()} 個）` : '這個範圍都找過了'}</button>
       </div>
       ${st.has_key ? '' : '<p class="small warn" style="margin:6px 0 0">還沒設定 YouTube API 金鑰，自動搜尋不能用。可以先自己貼連結（每列的 🎬）。</p>'}
       ${st.has_llm ? '' : '<p class="small warn" style="margin:6px 0 0">還沒設定 GEMINI_API_KEY，會改用關鍵字評分排序。</p>'}
-      <p class="small muted" style="margin:6px 0 0">流程：YouTube 依動作名稱撈候選 → 砍掉超過 3 分鐘的 → ${st.has_llm ? 'AI 判斷哪一支真的是這個動作' : '關鍵字評分'} → ${vAuto ? '<b>直接上線</b>' : '標成待審等你按'}。<b>都對不上就留空</b>，不硬掛。</p>`;
+      <p class="small muted" style="margin:6px 0 0">流程：${vWeb ? '網頁搜尋' : 'YouTube'} 依動作名稱撈候選 → 砍掉超過 3 分鐘的 → ${st.has_llm ? 'AI 判斷哪一支真的是這個動作' : '關鍵字評分'} → ${vAuto ? '<b>直接上線</b>' : '標成待審等你按'}。<b>都對不上就留空</b>，不硬掛。</p>`;
     const rv = $('#v_review', vbar); if (rv) rv.onclick = () => { onlySug = !onlySug; rv.setAttribute('aria-pressed', onlySug); draw(); };
     $('#v_scope', vbar).onchange = e => { vScope = e.target.value; drawVideoBar(); };
     $('#v_auto', vbar).onchange = e => { vAuto = e.target.checked; drawVideoBar(); };
+    const vw = $('#v_web', vbar); if (vw) vw.onchange = e => { vWeb = e.target.checked; drawVideoBar(); };
     const run = $('#v_run', vbar);
     if (run) run.onclick = async () => {
       // 一批 15 個是 Cloudflare 的上限，這裡自動接力跑完整個範圍
@@ -699,7 +701,7 @@ async function libraryPanel(host) {
       while (vRunning && seen < total) {
         let r;
         try {
-          r = await api('/api/video-search', { method: 'POST', body: { limit: st.per_run, auto: vAuto, category: vScope || undefined } });
+          r = await api('/api/video-search', { method: 'POST', body: { limit: st.per_run, auto: vAuto, category: vScope || undefined, source: vWeb ? 'web' : undefined } });
         } catch (e) { stopMsg = e.message; break; }
         if (!r.searched) break;                       // 這個範圍沒東西可跑了
         ok += r.done.reduce((a, x) => a + (x.count || 1), 0); none += r.skipped.length; bad += r.failed.length; seen += (r.covered || r.searched);
