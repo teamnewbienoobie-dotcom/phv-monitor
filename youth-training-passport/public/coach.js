@@ -873,7 +873,8 @@ function groupsPanel(host, cd) {
   $$('[data-gdel]', host).forEach(b => b.onclick = () => {
     const chip = b.closest('.chip'); const id = b.dataset.gdel;
     if (chip) chip.hidden = true;
-    undoable({ message: '已刪除組別，成員變成無組別（課表保留）',
+    // 「課表保留」講得不夠白：組別沒了，它的課表就沒人看得到，要到下面「中期目標與週課表」撿回來
+    undoable({ message: '已刪除組別，成員變成無組別。這個組的課表要到下面「中期目標與週課表」重新指定歸屬',
       onCommit: async () => { await api(`/api/groups?id=${id}`, { method: 'DELETE' }); C.athletes = null; renderCoach(); },
       onRollback: () => { if (chip) chip.hidden = false; } });
   });
@@ -884,12 +885,40 @@ async function blocksPanel(host, cd) {
   let ownerKey = localStorage.getItem('ytp-owner') || owners[0]?.k || '';
   const draw = async () => {
     const [ot, oid] = ownerKey.split(':');
-    const r = await api(`/api/blocks?owner_type=${ot}&owner_id=${oid}`);
-    host.innerHTML = `<div class="row"><select id="owner">${opt(owners, ownerKey, o => o.l, o => o.k)}</select><button class="btn sm" id="bnew">＋ 新 block</button><button class="btn sm ghost" id="snew">＋ 季</button></div>
+    const [r, orph] = await Promise.all([
+      api(`/api/blocks?owner_type=${ot}&owner_id=${oid}`),
+      api('/api/blocks?orphans=1').catch(() => ({ blocks: [] })),
+    ]);
+    // 歸屬的組別／學員被刪掉之後，課表會變成沒人看得到；在這裡撿回來
+    const orphanBox = orph.blocks.length ? `<div class="note" style="margin-bottom:8px">
+      <b>有 ${orph.blocks.length} 個課表沒有歸屬</b>：原本的組別或學員已經被刪掉，現在沒有人看得到。
+      ${orph.blocks.map(b => `<div class="row" style="justify-content:space-between;margin-top:6px">
+        <span>${esc(b.title)} <span class="small muted">${b.start_date || '?'} → ${b.end_date || '?'}</span></span>
+        <span class="row"><select class="orp_to" data-b="${b.id}">${opt(owners, ownerKey, o => o.l, o => o.k)}</select>
+          <button class="btn xs primary orp_go" data-b="${b.id}">接回來</button>
+          <button class="btn xs danger orp_del" data-b="${b.id}">刪掉</button></span></div>`).join('')}
+    </div>` : '';
+    host.innerHTML = `${orphanBox}<div class="row"><select id="owner">${opt(owners, ownerKey, o => o.l, o => o.k)}</select><button class="btn sm" id="bnew">＋ 新 block</button><button class="btn sm ghost" id="snew">＋ 季</button></div>
       ${r.seasons.length ? `<div class="chips">${r.seasons.map(s => `<span class="chip">季：${esc(s.title)} ${fmtDate(s.start_date)}–${fmtDate(s.end_date)} <button class="btn xs ghost" data-sdel="${s.id}">×</button></span>`).join('')}</div>` : ''}
       <div id="blist">${r.blocks.length ? r.blocks.map(b => `<details class="section" style="box-shadow:none"><summary><span>${esc(b.title)} <span class="small muted">${b.start_date || '?'} → ${b.end_date || '?'} · ${CAT_LABEL[b.main_axis]} · ${b.exercises.length} 動作</span></span></summary><div class="body"><div class="row"><button class="btn sm" data-bedit="${b.id}">編輯</button><button class="btn sm" data-bcopy="${b.id}">複製成新 block</button><button class="btn sm danger" data-bdel="${b.id}">刪除</button></div>${planGrid(b, null)}</div></details>`).join('') : '<p class="sec">還沒有 block。從範本開始最快。</p>'}</div>
       <div id="bedit"></div>`;
     $('#owner', host).onchange = e => { ownerKey = e.target.value; localStorage.setItem('ytp-owner', ownerKey); draw(); };
+    $$('.orp_go', host).forEach(b => b.onclick = async () => {
+      const sel = $(`.orp_to[data-b="${b.dataset.b}"]`, host);
+      const [t, oidTo] = sel.value.split(':');
+      try {
+        await api(`/api/blocks?id=${b.dataset.b}`, { method: 'PUT', body: { reassign_to: { owner_type: t, owner_id: oidTo } } });
+        draw();
+      } catch (e) { failToast(e); }
+    });
+    $$('.orp_del', host).forEach(b => b.onclick = () => {
+      const row = b.closest('.row'); row.hidden = true;
+      undoable({
+        message: '已刪掉這個沒有歸屬的課表',
+        onCommit: async () => { await api(`/api/blocks?id=${b.dataset.b}`, { method: 'DELETE' }); draw(); },
+        onRollback: () => { row.hidden = false; },
+      });
+    });
     $('#snew', host).onclick = async () => { const title = prompt('季名稱（例：2026 秋季）'); if (!title) return; const start = prompt('開始日 YYYY-MM-DD', today()); const end = prompt('結束日 YYYY-MM-DD', ''); await api('/api/seasons', { method: 'POST', body: { owner_type: ot, owner_id: oid, title, start_date: start, end_date: end } }); draw(); };
     $$('[data-sdel]', host).forEach(b => b.onclick = () => {
       const chip = b.closest('.chip'); const id = b.dataset.sdel;

@@ -92,6 +92,16 @@ export async function onRequest({ request, env }) {
         if (!b) return json({ error: 'Not found' }, 404);
         return json({ block: (await withExercises(env, [b]))[0] });
       }
+      // 孤兒課表：歸屬的組別或學員已經被刪掉，沒有任何人看得到它
+      if (url.searchParams.get('orphans')) {
+        const rows = (await env.DB.prepare(
+          `SELECT * FROM blocks WHERE
+             (owner_type='group'   AND owner_id NOT IN (SELECT id FROM groups))
+          OR (owner_type='athlete' AND owner_id NOT IN (SELECT id FROM athletes))
+           ORDER BY start_date, id`
+        ).all()).results;
+        return json({ blocks: await withExercises(env, rows) });
+      }
       const ot = url.searchParams.get('owner_type'), oid = url.searchParams.get('owner_id');
       const rows = (await env.DB.prepare('SELECT * FROM blocks WHERE owner_type=? AND owner_id=? ORDER BY start_date, sort_order, id').bind(ot, oid).all()).results;
       const seasons = (await env.DB.prepare('SELECT * FROM seasons WHERE owner_type=? AND owner_id=? ORDER BY start_date').bind(ot, oid).all()).results;
@@ -120,6 +130,14 @@ export async function onRequest({ request, env }) {
 
     if (request.method === 'PUT') {
       const b = await request.json();
+      // 只改歸屬（把孤兒課表接回某個組別或學員）
+      if (b.reassign_to) {
+        const ot = ['group', 'athlete'].includes(b.reassign_to.owner_type) ? b.reassign_to.owner_type : null;
+        if (!ot) return json({ error: 'owner_type 無效' }, 400);
+        await env.DB.prepare('UPDATE blocks SET owner_type=?, owner_id=? WHERE id=?')
+          .bind(ot, parseInt(b.reassign_to.owner_id, 10) || 0, id).run();
+        return json({ ok: true });
+      }
       const f = fields(b);
       await env.DB.prepare(
         `UPDATE blocks SET season_id=?, title=?, goal_text=?, main_axis=?, intensity=?, weeks=?, start_date=?, end_date=?, ramp_template_id=?, raise_types=?, am_types=?, act_types=?, mob_types=?, pot_types=?, sort_order=?, goal_kind=?, phase=?, emphasis=?, goal_template_id=? WHERE id=?`
