@@ -812,7 +812,7 @@ small.warn{ color: var(--warn); }
 .libfam > summary::-webkit-details-marker{ display: none; }
 .libfam[open] > summary{ border-block-end: var(--rule-hair) solid var(--rule-soft); }
 .libitems{ padding: var(--space-3xs) var(--space-sm) var(--space-xs); }
-.lib-item{ display: grid; grid-template-columns: auto auto minmax(0,1fr) auto auto auto auto auto; gap: var(--space-xs);
+.lib-item{ display: grid; grid-template-columns: auto auto minmax(0,1fr) auto auto auto; gap: var(--space-xs);
            align-items: center; padding-block: var(--space-xs); border-block-start: var(--rule-hair) solid var(--rule-soft); }
 .lib-item:first-child{ border-block-start: 0; }
 .lib-item .lk{ display: flex; }
@@ -825,9 +825,18 @@ small.warn{ color: var(--warn); }
 .lib-item .sg{ width: 20px; height: 20px; border-radius: 5px; background: var(--seg, var(--accent)); color: var(--seg-ink, var(--accent-ink));
                font-family: var(--font-display); font-weight: 900; font-size: var(--text-sm);
                display: flex; align-items: center; justify-content: center; flex: none; }
+.lib-item .acts{ display: flex; gap: var(--space-3xs); align-items: center; }
 @media (max-width: 35rem){
-  .lib-item{ grid-template-columns: auto auto minmax(0,1fr) auto auto auto; }
-  .lib-item .d{ grid-column: 3 / -1; grid-row: 2; text-align: start; }
+  /* 手機兩行：上排是勾選／縮圖／名稱／板塊，下排是劑量與操作鈕 */
+  .lib-item{ grid-template-columns: auto auto minmax(0,1fr) auto;
+             grid-template-areas: "ck th nm sg" "d d acts acts"; row-gap: var(--space-3xs); }
+  .lib-item .lk{ grid-area: ck; }
+  .lib-item .dot, .lib-item > .thumb{ grid-area: th; }
+  .lib-item .nm{ grid-area: nm; }
+  .lib-item .sg{ grid-area: sg; }
+  .lib-item .d{ grid-area: d; text-align: start; align-self: center; }
+  .lib-item .acts{ grid-area: acts; justify-content: flex-end; }
+  .lib-item .vsug{ grid-area: auto; grid-column: 1 / -1; }
 }
 .lib-row.edit{ padding-block: var(--space-xs); border-block-start: var(--rule-hair) solid var(--rule-soft); }
 .lib-list{ display: flex; flex-direction: column; gap: var(--space-2xs); }

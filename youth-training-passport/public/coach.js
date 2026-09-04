@@ -610,7 +610,7 @@ async function libraryPanel(host) {
     <span class="nm">${esc(it.name)}${it.level ? `<em>L${it.level}</em>` : ''}${it.custom ? '<em class="cu">自訂</em>' : ''}${vidBadge(it)}</span>
     <span class="d">${it.sets ? `${it.sets} × ` : ''}${esc(it.reps || '')}</span>
     <span class="sg" title="預設板塊" style="${segVars(it.segment)}">${SEG[it.segment].letter}</span>
-    <button class="btn xs l_vid" title="貼影片連結">🎬</button>${it.video_status === 'nomatch' ? '<button class="btn xs l_requery" title="換關鍵字重搜">🔍</button>' : ''}<button class="btn xs l_edit">改</button><button class="btn xs danger l_del" title="從動作庫移除">×</button>
+    <span class="acts"><button class="btn xs l_vid" title="貼影片連結">🎬</button>${it.video_status === 'nomatch' ? '<button class="btn xs l_requery" title="換關鍵字重搜">🔍</button>' : ''}<button class="btn xs l_edit">改</button><button class="btn xs danger l_del" title="從動作庫移除">×</button></span>
     ${it.video_status === 'suggested' ? `<div class="vsug" data-id="${it.id}">
       <div class="vs-info"><b>${esc(it.video.title)}</b><span class="small muted">${esc(it.video.channel)}${it.video.seconds != null ? ` · ${fmtDur(it.video.seconds)}` : ''}${it.video_reason ? ` · AI：${esc(it.video_reason)}` : ''}</span></div>
       <div class="row"><button class="btn xs primary v_ok">用這支</button><button class="btn xs v_next"${(it.video_alts || []).length ? '' : ' disabled'}>換一支${(it.video_alts || []).length ? `（還有 ${it.video_alts.length}）` : ''}</button><button class="btn xs v_skip">不用影片</button></div>
