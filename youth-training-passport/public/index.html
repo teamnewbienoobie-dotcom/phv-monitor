@@ -549,12 +549,14 @@ input::placeholder,textarea::placeholder{ color: var(--ink-3); }
 .erow-edit .dz select{ padding: var(--space-2xs) var(--space-3xs); font-size: var(--text-xs); min-height: 36px; }
 .erow-edit .x_reps{ text-align: start !important; }
 .erow-edit .x_del{ width: 28px; padding: 0; min-height: 28px; }
-/* 有示範影片的動作，排課時左邊多一格縮圖 */
+/* 有示範影片的動作，排課時左邊多一格縮圖。
+   桌機沒有具名區域，交給自動排版（縮圖是第一個子元素，會落在第一欄）；
+   手機才需要 grid-area，因為那邊有 grid-template-areas。 */
 .erow-edit:has(> .thumb){ grid-template-columns: auto minmax(0,1fr) auto 28px; }
-.erow-edit > .thumb{ grid-area: th; }
 @media (max-width: 35rem){
   .erow-edit{ grid-template-columns: minmax(0,1fr) 28px; grid-template-areas: "nm del" "dz dz"; }
   .erow-edit:has(> .thumb){ grid-template-columns: auto minmax(0,1fr) 28px; grid-template-areas: "th nm del" "dz dz dz"; }
+  .erow-edit > .thumb{ grid-area: th; }
   .erow-edit .x_name{ grid-area: nm; }
   .erow-edit .x_del{ grid-area: del; }
   .erow-edit .dz{ grid-area: dz; grid-template-columns: 5.25rem 2.625rem minmax(0,1fr) 3.25rem; }
