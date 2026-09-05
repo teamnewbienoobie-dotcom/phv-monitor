@@ -201,6 +201,8 @@ function route() {
   const h = location.hash || '#/';
   // 教練後台是密度優先的工作台 → 給桌面寬版；護照維持單欄的閱讀寬度
   $('#app').classList.toggle('wide', h.startsWith('#/coach'));
+  // 首頁是全出血的 landing，其他頁維持固定寬的閱讀欄
+  $('#app').classList.toggle('home', !h.startsWith('#/coach') && !/^#\/p\//.test(h));
   const m = h.match(/^#\/p\/([^/?]+)/);
   if (m) return renderPassport(decodeURIComponent(m[1]));
   if (h.startsWith('#/coach')) return window.renderCoach ? renderCoach() : renderHome();
@@ -212,23 +214,232 @@ window.addEventListener('DOMContentLoaded', async () => { await checkToken(); ro
 /* ---------- home ---------- */
 function renderHome() {
   const app = $('#app');
+  let lastId = '', lastName = '', opens = 0;
+  try {
+    lastId = localStorage.getItem('ytp-last-id') || '';
+    lastName = localStorage.getItem('ytp-last-name') || '';
+    opens = parseInt(localStorage.getItem('ytp-open-count') || '0', 10) || 0;
+  } catch { /* 隱私模式：當第一次來 */ }
+  const returning = !!(lastId && lastName);
+
   app.innerHTML = `
-    <div class="topbar"><a class="brand" href="#/">訓練護照</a>
-      ${S.coach ? `<span class="row"><a class="btn sm" href="#/coach">教練後台</a><button class="btn sm ghost" id="logout">登出</button></span>` : `<button class="btn sm ghost" id="coachbtn">教練登入</button>`}</div>
-    <div class="hero"><div class="eyebrow">Youth Training Passport</div><h1>你的訓練，一塊一塊蓋起來。</h1>
-      <p>輸入教練給你的 ID，看看自己的訓練塔蓋到哪了、七種能力練得平不平均。</p></div>
-    <form class="search" id="sf"><label class="field full" for="sid"><span class="small sec">護照 ID</span>
-      <input id="sid" placeholder="Ig9yNWU0sD23" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="serr"></label><button class="btn primary" type="submit">查看</button></form>
-    <p id="serr" class="msg err" hidden></p>
-    <div class="folio"><div class="folio-title">塔是怎麼蓋的？</div>
-      <p class="sec small">每堂課的時間會依「基礎動作、肌力、爆發力、增強式、速度敏捷、能量系統、活動度」七種能力分配。某一種能力累積到門檻分鐘數，就長出一塊那個顏色的方塊。一個 block（4–6 週）結束會畫一條完成線。教練看到你有突破，會額外送金、銀或彩虹方塊。</p>
-      <div class="legend">${CATS.map(c => `<span><i style="background:${catColor(c)}"></i>${CAT_LABEL[c]}</span>`).join('')}</div></div>
-    <footer class="colophon">訓練護照 · Youth Training Passport　—　方塊塔以七項能力的累積分鐘數換算；門檻＝200 分鐘 × 該階段目標比重。金／銀／彩虹方塊由教練依突破頒發，不計入科學圖。<br>資料由教練登錄，家長與學員為唯讀。ID 請向教練索取。</footer>`;
-  $('#sf').onsubmit = e => { e.preventDefault(); const v = $('#sid').value.trim(); if (!v) { const el = $('#serr'); el.textContent = '先填教練給你的 ID'; el.hidden = false; $('#sid').setAttribute('aria-invalid', 'true'); $('#sid').focus(); return; } location.hash = `#/p/${encodeURIComponent(v)}`; };
-  $('#sid').oninput = () => { $('#serr').hidden = true; $('#sid').removeAttribute('aria-invalid'); };
+    <main class="lp-stage">
+      <picture>
+        <source media="(max-width:640px)" srcset="assets/hero-portrait.jpg">
+        <img class="lp-hero" src="assets/hero-wide.jpg"
+             alt="小小運動員站在最前方，八位世界運動選手層層堆疊在他們身後的陽光裡">
+      </picture>
+
+      <header class="lp-top">
+        <a class="lp-brand" href="#/"><img src="assets/logo.png" alt=""><b>訓練護照</b></a>
+        ${S.coach
+          ? `<span class="row"><a class="lp-link" href="#/coach">教練後台</a><button class="lp-link" type="button" id="logout">登出</button></span>`
+          : `<button class="lp-link" type="button" id="coachbtn">教練登入</button>`}
+      </header>
+
+      <div class="lp-head">
+        <span class="lp-eyebrow">Youth Training Passport</span>
+        <h1>你的訓練，一塊一塊蓋起來。</h1>
+        <p>輸入教練給你的護照編號，蓋下屬於你的那個章。</p>
+      </div>
+
+      <div class="lp-foot">
+        <button class="lp-seal" id="seal" type="button" ${returning ? '' : 'disabled'}
+                aria-describedby="lphint"
+                aria-label="${returning ? `長按印章，開啟 ${esc(lastName)} 的護照` : '長按印章開啟護照'}">
+          <span class="lp-burst" aria-hidden="true">
+            <span class="flash"></span>
+            <span class="rays"></span>
+            <svg class="ribbons" viewBox="-100 -100 200 200" aria-hidden="true">
+              <path style="rotate:0deg;   animation-delay:60ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:45deg;  animation-delay:96ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:90deg;  animation-delay:72ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:135deg; animation-delay:120ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:180deg; animation-delay:84ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:225deg; animation-delay:132ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:270deg; animation-delay:66ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+              <path style="rotate:315deg; animation-delay:108ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+            </svg>
+          </span>
+          <span class="ink" aria-hidden="true"></span>
+          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="track" cx="50" cy="50" r="47"></circle>
+            <circle class="bar"   cx="50" cy="50" r="47"></circle>
+          </svg>
+          <span class="body">
+            <img src="assets/stamp.png" alt="">
+            <span class="name" id="sealName">${returning ? esc(lastName) : ''}</span>
+          </span>
+          <span class="sparks" id="sparks" aria-hidden="true"></span>
+        </button>
+
+        <p class="lp-hint" id="lphint" role="status" aria-live="polite"></p>
+
+        <form class="lp-enter" id="sf" autocomplete="off" ${returning ? 'hidden' : ''}>
+          <input id="sid" inputmode="latin" autocapitalize="off" autocorrect="off" spellcheck="false"
+                 placeholder="Ig9yNWU0sD23" aria-label="護照編號" value="${esc(lastId)}">
+          <button type="submit">查詢</button>
+        </form>
+        ${returning ? `<button class="lp-flag" type="button" id="switchid">不是 ${esc(lastName)}？換一個編號</button>` : ''}
+      </div>
+    </main>
+
+    <div class="page-in">
+      <div class="folio"><div class="folio-title">塔是怎麼蓋的？</div>
+        <p class="sec small">每堂課的時間會依「基礎動作、肌力、爆發力、增強式、速度敏捷、能量系統、活動度」七種能力分配。某一種能力累積到門檻分鐘數，就長出一塊那個顏色的方塊。一個 block（4–6 週）結束會畫一條完成線。教練看到你有突破，會額外送金、銀或彩虹方塊。</p>
+        <div class="legend">${CATS.map(c => `<span><i style="background:${catColor(c)}"></i>${CAT_LABEL[c]}</span>`).join('')}</div></div>
+      <footer class="colophon">訓練護照 · Youth Training Passport　—　方塊塔以七項能力的累積分鐘數換算；門檻＝200 分鐘 × 該階段目標比重。金／銀／彩虹方塊由教練依突破頒發，不計入科學圖。<br>資料由教練登錄，家長與學員為唯讀。編號請向教練索取。</footer>
+    </div>`;
+
+  wireLanding({ lastId, lastName, opens, returning });
+
   const cb = $('#coachbtn'); if (cb) cb.onclick = () => askPassword(() => { location.hash = '#/coach'; });
   const lo = $('#logout'); if (lo) lo.onclick = logout;
-  const last = localStorage.getItem('ytp-last-id'); if (last) $('#sid').value = last;
+}
+
+/* ---------- landing 的蓋章互動 ----------
+ * 規格見 BRAND.md §5：長按 1.6 秒、三重回饋、第 3 次之後改短按。
+ * 唯一鍵永遠是 public_id，名字只做刻印。 */
+const HOLD_MS = 1600;
+const SKIP_AFTER = 3;
+
+function wireLanding(init) {
+  const seal = $('#seal'), nameEl = $('#sealName'), hint = $('#lphint');
+  const form = $('#sf'), input = $('#sid');
+  if (!seal) return;
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const st = { id: init.lastId, name: init.lastName, opens: init.opens, holding: false, raf: 0, p: 0, done: false };
+  const shortcut = () => reduce || st.opens >= SKIP_AFTER;
+
+  const setP = v => { st.p = v; seal.style.setProperty('--p', v.toFixed(4)); };
+  const say = (msg, warn) => { hint.textContent = msg; hint.classList.toggle('warn', !!warn); };
+
+  say(init.returning
+    ? (shortcut() ? '輕觸印章即可進入' : `歡迎回來，${init.lastName}。按住印章 1.6 秒`)
+    : '先輸入護照編號');
+
+  /* 查編號 → 章上刻名字。查不到就照實說，不要靜默失敗。 */
+  if (form) form.onsubmit = async e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if (!v) { say('先填教練給你的編號', true); input.focus(); return; }
+    say('查詢中…');
+    try {
+      const pp = await api(`/api/passport?id=${encodeURIComponent(v)}`);
+      engrave(pp.athlete.public_id, pp.athlete.nickname || pp.athlete.public_id);
+    } catch {
+      say('這個編號查不到。跟教練確認一下有沒有打錯', true);
+      input.setAttribute('aria-invalid', 'true'); input.focus();
+    }
+  };
+  if (input) input.oninput = () => { input.removeAttribute('aria-invalid'); };
+
+  const sw = $('#switchid');
+  if (sw) sw.onclick = () => {
+    try { localStorage.removeItem('ytp-last-name'); } catch {}
+    renderHome();
+  };
+
+  function engrave(id, name) {
+    st.id = id; st.name = name;
+    nameEl.textContent = name;
+    seal.disabled = false;
+    seal.setAttribute('aria-label', `長按印章，開啟 ${name} 的護照`);
+    if (form) form.hidden = true;
+    say(shortcut() ? '輕觸印章即可進入' : '按住印章 1.6 秒，蓋下你的章');
+  }
+
+  /* 呼吸法餘燼：向外飛散並略微上飄 */
+  function emberBurst() {
+    if (reduce) return;
+    const box = $('#sparks');
+    box.textContent = '';
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2 + (Math.random() - .5) * .28;
+      const dist = 78 + Math.random() * 86;
+      const el = document.createElement('i');
+      el.style.setProperty('--x', `${(Math.cos(a) * dist).toFixed(1)}px`);
+      el.style.setProperty('--y', `${(Math.sin(a) * dist - 22).toFixed(1)}px`);
+      el.style.setProperty('--s', `${(2.5 + Math.random() * 3.5).toFixed(1)}px`);
+      el.style.setProperty('--t', `${(40 + Math.random() * 190).toFixed(0)}ms`);
+      el.style.setProperty('--dur', `${(720 + Math.random() * 460).toFixed(0)}ms`);
+      frag.appendChild(el);
+    }
+    box.appendChild(frag);
+    setTimeout(() => { if (box.isConnected) box.textContent = ''; }, 1500);
+  }
+
+  function start(e) {
+    if (seal.disabled || st.done) return;
+    if (e && e.type === 'pointerdown' && e.button !== 0) return;
+    if (shortcut()) { finish(); return; }
+    if (st.holding) return;
+    st.holding = true;
+    seal.classList.remove('nudge');
+    const t0 = performance.now() - st.p * HOLD_MS;
+    cancelAnimationFrame(st.raf);
+    const step = now => {
+      if (!st.holding) return;
+      const p = Math.min(1, (now - t0) / HOLD_MS);
+      setP(p);
+      if (p >= 1) { st.holding = false; finish(); return; }
+      st.raf = requestAnimationFrame(step);
+    };
+    step(performance.now());
+  }
+
+  function release() {
+    if (!st.holding || st.done) return;
+    st.holding = false;
+    cancelAnimationFrame(st.raf);
+    if (st.p < 0.06) {                       // 幾乎等於短按
+      setP(0);
+      seal.classList.remove('nudge');
+      void seal.offsetWidth;
+      seal.classList.add('nudge');
+      say('按住不放，別鬆手', true);
+      return;
+    }
+    say('差一點 —— 再按久一點', true);        // 讓「差一點」被看見
+    const from = st.p, t0 = performance.now(), dur = 260;
+    const back = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      setP(from * (1 - k * k));
+      if (k < 1) st.raf = requestAnimationFrame(back); else setP(0);
+    };
+    st.raf = requestAnimationFrame(back);
+  }
+
+  function finish() {
+    st.done = true;
+    setP(1);
+    seal.classList.add('done');
+    emberBurst();
+    say('已蓋章 · 開啟護照');
+    try {
+      localStorage.setItem('ytp-last-id', st.id);
+      localStorage.setItem('ytp-last-name', st.name);
+      localStorage.setItem('ytp-open-count', String(st.opens + 1));
+    } catch { /* 隱私模式：不記就算了 */ }
+    setTimeout(() => { location.hash = `#/p/${encodeURIComponent(st.id)}`; }, reduce ? 0 : 620);
+  }
+
+  seal.addEventListener('pointerdown', start);
+  seal.addEventListener('pointerup', release);
+  seal.addEventListener('pointercancel', release);
+  seal.addEventListener('pointerleave', release);
+  seal.addEventListener('contextmenu', e => e.preventDefault());
+  seal.addEventListener('keydown', e => {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault(); if (e.repeat) return; start(e);
+  });
+  seal.addEventListener('keyup', e => {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault(); release();
+  });
+  seal.addEventListener('blur', release);
 }
 
 /* ---------- passport ---------- */
@@ -244,7 +455,7 @@ async function renderPassport(id, keepTab = false) {
   let pp;
   try { pp = await loadPassport(id); }
   catch (e) {
-    app.innerHTML = `<div class="topbar"><a class="brand" href="#/">訓練護照</a></div><div class="card"><h3>找不到這個 ID</h3><p class="sec">「${esc(id)}」不存在，確認一下教練給你的 ID 有沒有打錯（大小寫不分）。</p><a class="btn" href="#/">回首頁</a></div>`;
+    app.innerHTML = `<div class="topbar"><a class="brand" href="#/"><img src="assets/logo.png" alt="">訓練護照</a></div><div class="card"><h3>找不到這個 ID</h3><p class="sec">「${esc(id)}」不存在，確認一下教練給你的 ID 有沒有打錯（大小寫不分）。</p><a class="btn" href="#/">回首頁</a></div>`;
     return;
   }
   const a = pp.athlete;
@@ -254,7 +465,7 @@ async function renderPassport(id, keepTab = false) {
   if (!tabs.some(t => t[0] === S.tab)) S.tab = 'tower';
   const age = a.birth_year ? `${new Date().getFullYear() - a.birth_year} 歲` : '';
   app.innerHTML = `
-    <div class="topbar"><a class="brand" href="#/">訓練護照</a>
+    <div class="topbar"><a class="brand" href="#/"><img src="assets/logo.png" alt="">訓練護照</a>
       ${S.coach ? `<span class="row"><a class="btn sm" href="#/coach">教練後台</a><button class="btn sm ghost" id="logout">登出</button></span>` : `<button class="btn sm ghost" id="coachbtn">教練登入</button>`}</div>
     <div class="header">
       <div class="header-text"><div class="eyebrow"><span class="mono">${esc(a.public_id)}</span>${pp.current_block ? ` · ${esc(pp.current_block.title)}` : ''}</div>

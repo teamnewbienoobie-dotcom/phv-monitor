@@ -40,6 +40,21 @@
   --accent-soft:   oklch(94% 0.030 286);
   --focus:         oklch(48% 0.180 286);
 
+  /* ---- landing 天空層（只服務 landing，工具頁不用）---- */
+  --sky-hi:   oklch(96.4% 0.020 174);  /* 主圖天空上緣，幾乎等同 --paper */
+  --sky:      oklch(90.7% 0.062 213);
+  --sky-deep: oklch(78.9% 0.092 239);
+  --gold-ray: oklch(93.6% 0.051 90);   /* 陽光光束 */
+  --gold-mon: oklch(84.6% 0.100 88);   /* 和柄雲紋 */
+  --navy:     oklch(27.9% 0.089 265);
+
+  /* ---- 品牌色（取樣自 標準logo.png）----
+   * ⚠️ --brand 與 --c-strength 數值上是同一個顏色（both hue 30）。
+   * --brand 永遠不當 UI 狀態色，且不與七元素同框。詳見 BRAND.md §2.4。 */
+  --brand:       oklch(54.4% 0.171 30);
+  --brand-steel: oklch(49.7% 0.077 240);
+  --brand-ink:   oklch(99.2% 0.004 165);
+
   /* ---- 七元素：solid 給圖塊與點，deep 給文字，soft 給底 ---- */
   --c-fms:           oklch(56% 0.150 258);
   --c-fms-deep:      oklch(40% 0.130 258);
@@ -134,6 +149,17 @@
     --accent-ink:    oklch(18% 0.040 286);
     --accent-soft:   oklch(30% 0.060 286);
     --focus:         oklch(78% 0.140 286);
+
+    /* ---- landing 天空層 · dark：壓暗但不翻成夜景 ---- */
+    --sky-hi:   oklch(32% 0.028 200);
+    --sky:      oklch(27% 0.045 213);
+    --sky-deep: oklch(22% 0.055 239);
+    --gold-ray: oklch(72% 0.070 90);
+    --gold-mon: oklch(60% 0.085 88);
+    --navy:     oklch(72% 0.070 265);
+    --brand:       oklch(66% 0.150 30);
+    --brand-steel: oklch(70% 0.065 240);
+    --brand-ink:   oklch(16% 0.030 30);
     --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
     --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
     --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);
@@ -166,6 +192,17 @@
   --accent-ink:    oklch(18% 0.040 286);
   --accent-soft:   oklch(30% 0.060 286);
   --focus:         oklch(78% 0.140 286);
+
+  /* ---- landing 天空層 · dark：壓暗但不翻成夜景 ---- */
+  --sky-hi:   oklch(32% 0.028 200);
+  --sky:      oklch(27% 0.045 213);
+  --sky-deep: oklch(22% 0.055 239);
+  --gold-ray: oklch(72% 0.070 90);
+  --gold-mon: oklch(60% 0.085 88);
+  --navy:     oklch(72% 0.070 265);
+  --brand:       oklch(66% 0.150 30);
+  --brand-steel: oklch(70% 0.065 240);
+  --brand-ink:   oklch(16% 0.030 30);
   --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
   --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
   --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);

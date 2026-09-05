@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>訓練護照 · Landing 原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<!-- token 主檔。移植進 index.html 時改吃它既有的內嵌 <style> -->
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ============================================================
+   Landing 原型 — 只有 landing 用得到的樣式。
+   顏色一律走 var(--token)，不寫死 hex。見 BRAND.md §2 / §9。
+   ============================================================ */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:clip;font-family:var(--font-body)}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-body);font-size:var(--text-md);line-height:var(--lh-body);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 舞台 ---------- */
+.stage{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:clamp(560px, 82svh, 780px);
+  /* 手機：主圖是八人金字塔，舞台要夠高角色才不會被壓成豆子 */
+  @media (max-width:640px){ min-height:clamp(620px, 92svh, 900px); }
+  display:grid;grid-template-rows:auto 1fr auto;
+  padding:var(--space-md) var(--gutter) var(--space-lg);
+  background:var(--sky-hi);
+}
+/* 主圖：16:9 母片，中央安全區。手機直式靠 object-position:center 保住兩個孩子 */
+/* 主圖走 art direction：手機吃直式母片、桌機吃寬式母片。
+ * 不是同一張圖裁兩次 —— 一列橫排的構圖在手機上必定掉人，
+ * 所以兩張都是「中央金字塔堆疊」的獨立構圖。見 BRAND.md §4.3。 */
+.stage>picture{position:absolute;inset:0;z-index:-2;display:block}
+.stage .hero{
+  width:100%;height:100%;object-fit:cover;display:block;
+  object-position:center 30%;
+}
+@media (max-width:640px){
+  .stage .hero{object-position:center 22%}
+}
+/* 上下柔化，讓文字與印章讀得到。不是暗角，是天空的延伸 */
+.stage::before,.stage::after{
+  content:"";position:absolute;left:0;right:0;z-index:-1;pointer-events:none;
+}
+/* 上緣柔化偏重 —— 這是刻意的：頂層兩顆大頭像被洗淡成「背景陣容」，
+ * 視線才會落到前排的兩個孩子身上。定案於 2026-09-05。 */
+.stage::before{
+  top:0;height:44%;
+  background:linear-gradient(to bottom,
+    var(--sky-hi) 0%,
+    oklch(from var(--sky-hi) l c h / .82) 42%,
+    transparent 100%);
+}
+/* 下緣淡成天空色 —— 印章因此蓋在「紙」上，而不是蓋在孩子的腿上 */
+.stage::after{
+  bottom:0;height:56%;
+  background:linear-gradient(to top,
+    var(--sky-hi) 0%,
+    var(--sky-hi) 26%,
+    oklch(from var(--sky-hi) l c h / .72) 52%,
+    transparent 100%);
+}
+
+/* ---------- 頁首 ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
+.brandmark{display:flex;align-items:center;gap:var(--space-xs);text-decoration:none;color:inherit}
+.brandmark img{width:38px;height:auto;display:block}
+.brandmark b{
+  font-family:var(--font-display);font-weight:900;font-size:var(--text-lg);
+  letter-spacing:.01em;line-height:1;color:var(--navy);
+}
+.linkbtn{
+  font:500 var(--text-sm)/1 var(--font-body);color:var(--navy);
+  background:oklch(from var(--sky-hi) l c h / .72);
+  border:var(--rule-hair) solid oklch(from var(--navy) l c h / .28);
+  border-radius:var(--radius-pill);padding:.5em .95em;cursor:pointer;
+}
+.linkbtn:hover{background:var(--sky-hi)}
+.linkbtn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ---------- 標題（壓在兩個孩子上方）---------- */
+.headline{
+  align-self:start;text-align:center;margin-top:var(--space-xs);
+  display:grid;gap:var(--space-2xs);justify-items:center;
+}
+.eyebrow{
+  font-family:var(--font-outlier);font-size:var(--text-2xs);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--brand);
+}
+.headline h1{
+  margin:0;font-family:var(--font-display);font-weight:900;
+  /* 手機上收斂一級：標題吃掉的高度要還給主圖 */
+  font-size:clamp(1.6rem, 6.4vw, 3.1rem);line-height:var(--lh-display);
+  letter-spacing:-.01em;color:var(--navy);text-wrap:balance;
+  max-width:16ch;
+}
+.headline p{
+  margin:0;font-size:var(--text-sm);color:var(--navy);max-width:26ch;
+  /* 副標可能落在角色身上 —— 給它一點光暈保底 */
+  text-shadow:0 1px 3px oklch(from var(--sky-hi) l c h / .95),
+              0 0 12px oklch(from var(--sky-hi) l c h / .9);
+}
+
+/* ---------- 底部：印章 + 輸入 ---------- */
+.foot{display:grid;justify-items:center;gap:var(--space-sm);align-self:end}
+
+/* 印章：壓在畫面下緣中央，斜壓過孩子腳邊（BRAND.md §5）*/
+.seal{
+  position:relative;width:clamp(130px, 33vw, 190px);aspect-ratio:1;
+  display:grid;place-items:center;
+  background:none;border:0;padding:0;margin:0;
+  cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;
+  --p:0;                       /* 0→1 長按進度，由 JS 驅動 */
+  transform:rotate(-6deg);
+}
+.seal:disabled{cursor:not-allowed}
+.seal:focus-visible{outline:3px solid var(--focus);outline-offset:6px;border-radius:50%}
+
+/* 回饋 1／墨水：從章底往外滲 */
+.seal .ink{
+  position:absolute;left:50%;top:56%;width:190%;aspect-ratio:1;
+  translate:-50% -50%;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    oklch(from var(--brand) l c h / .38) 0%,
+    oklch(from var(--brand) l c h / .26) 46%,
+    oklch(from var(--brand) l c h / 0) 68%);
+  scale:calc(.18 + var(--p) * .82);
+  opacity:calc(var(--p) * 1);
+  filter:blur(calc(2px + var(--p) * 5px));
+  pointer-events:none;
+}
+/* 回饋 2／章身：按住時往下壓 */
+.seal .body{
+  position:relative;width:100%;height:100%;
+  display:grid;place-items:center;
+  translate:0 calc(var(--p) * 7px);
+  scale:calc(1 - var(--p) * .045);
+  filter:drop-shadow(0 calc(10px - var(--p) * 8px) calc(16px - var(--p) * 10px)
+         oklch(from var(--navy) l c h / calc(.30 - var(--p) * .16)));
+  transition:translate var(--dur-micro) var(--ease-out);
+}
+.seal .body img{width:100%;height:100%;object-fit:contain;display:block}
+/* 名字刻在下緣紅帶上 */
+.seal .name{
+  position:absolute;left:50%;top:73.5%;translate:-50% -50%;
+  width:52%;text-align:center;
+  font-family:var(--font-body);font-weight:700;
+  font-size:clamp(.8rem, 3.1vw, 1rem);line-height:1;
+  color:var(--brand-ink);
+  text-shadow:0 1px 2px oklch(from var(--navy) l c h / .35);
+  pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.seal .name:empty::after{
+  content:"— — —";opacity:.5;letter-spacing:.2em;
+}
+/* 回饋 3／環形進度 */
+.seal .ring{
+  position:absolute;inset:-7%;width:114%;height:114%;
+  transform:rotate(-90deg);pointer-events:none;overflow:visible;
+}
+.seal .ring circle{fill:none;stroke-linecap:round}
+.seal .ring .track{stroke:oklch(from var(--navy) l c h / .16);stroke-width:2.4}
+.seal .ring .bar{
+  stroke:var(--brand);stroke-width:3.4;
+  stroke-dasharray:295.31;
+  stroke-dashoffset:calc(295.31 * (1 - var(--p)));
+}
+/* 短按彈一下 */
+@keyframes nudge{
+  0%,100%{rotate:0deg;scale:1}
+  30%{rotate:-3deg;scale:1.05}
+  62%{rotate:2.5deg;scale:.985}
+}
+.seal.nudge .body{animation:nudge 380ms var(--ease-out)}
+/* 完成頓點 */
+@keyframes thud{
+  0%{scale:1}
+  22%{scale:.9}
+  100%{scale:1.03}
+}
+.seal.done .body{animation:thud 340ms var(--ease-out) forwards}
+.seal.done{pointer-events:none}
+
+/* ============================================================
+   呼吸法金光 — 蓋章瞬間爆發。四層：
+   ① flash 核心閃光 ② rays 放射光芒 ③ ribbons 火焰流體弧 ④ sparks 餘燼
+   顏色只走 --gold-ray / --gold-mon，不新增色票。
+   ============================================================ */
+.burst{
+  position:absolute;left:50%;top:50%;width:300%;aspect-ratio:1;
+  translate:-50% -50%;pointer-events:none;
+  opacity:0;                      /* 未蓋章時完全不存在 */
+}
+.seal.done .burst{opacity:1}
+
+/* ① 核心閃光 */
+.burst .flash{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,
+    oklch(from var(--gold-ray) l c h / .95) 0%,
+    oklch(from var(--gold-mon) l c h / .62) 20%,
+    oklch(from var(--gold-mon) l c h / .18) 40%,
+    oklch(from var(--gold-mon) l c h / 0)   62%);
+  scale:.18;opacity:0;
+}
+.seal.done .flash{animation:flash 660ms var(--ease-out) forwards}
+@keyframes flash{
+  0%  {scale:.18;opacity:0}
+  13% {scale:.58;opacity:1}
+  100%{scale:1.55;opacity:0}
+}
+
+/* ② 放射光芒 */
+.burst .rays{
+  position:absolute;inset:9%;border-radius:50%;
+  background:repeating-conic-gradient(from -7deg,
+    oklch(from var(--gold-ray) l c h / 0)   0deg 4.5deg,
+    oklch(from var(--gold-ray) l c h / .8)  6deg 8deg,
+    oklch(from var(--gold-ray) l c h / 0)   9.5deg 15deg);
+  filter:blur(5px);
+  -webkit-mask:radial-gradient(circle, transparent 16%, #000 32%, #000 64%, transparent 86%);
+          mask:radial-gradient(circle, transparent 16%, #000 32%, #000 64%, transparent 86%);
+  scale:.35;opacity:0;
+}
+.seal.done .rays{animation:rays 820ms var(--ease-out) 40ms forwards}
+@keyframes rays{
+  0%  {scale:.35;opacity:0;   rotate:0deg}
+  18% {opacity:.95}
+  100%{scale:1.28;opacity:0;  rotate:26deg}
+}
+
+/* ③ 火焰流體弧 — 呼吸法的招牌 */
+.burst .ribbons{
+  position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+}
+.burst .ribbons path{
+  fill:var(--gold-ray);
+  transform-box:view-box;transform-origin:0 0;
+  scale:.22;opacity:0;
+  filter:blur(.6px);
+}
+.seal.done .ribbons path{animation:rib 940ms var(--ease-out) forwards}
+@keyframes rib{
+  0%  {scale:.22;opacity:0}
+  20% {opacity:.92}
+  100%{scale:1.18;opacity:0}
+}
+
+/* ④ 餘燼 — JS 生成，每顆帶自己的角度與距離 */
+.sparks{position:absolute;inset:0;pointer-events:none}
+.sparks i{
+  position:absolute;left:50%;top:50%;
+  width:var(--s);height:var(--s);border-radius:50%;
+  background:var(--gold-ray);
+  box-shadow:0 0 7px 2px oklch(from var(--gold-mon) l c h / .75);
+  opacity:0;
+  animation:spark var(--dur) var(--ease-out) var(--t) forwards;
+}
+@keyframes spark{
+  0%  {opacity:0; translate:-50% -50%;                                    scale:.35}
+  14% {opacity:1}
+  100%{opacity:0; translate:calc(-50% + var(--x)) calc(-50% + var(--y));  scale:.15}
+}
+
+/* 動效敏感：只留一次柔和的金色暈開，不放粒子 */
+@media (prefers-reduced-motion:reduce){
+  .burst .rays,.burst .ribbons,.sparks{display:none}
+  .seal.done .flash{animation:none;scale:1.1;opacity:.55}
+}
+
+.hint{
+  min-height:1.4em;font-size:var(--text-sm);font-weight:500;
+  color:var(--navy);text-align:center;
+  background:oklch(from var(--sky-hi) l c h / .8);
+  border-radius:var(--radius-pill);padding:.25em 1em;
+}
+.hint.warn{color:var(--brand);font-weight:700}
+
+/* 編號輸入 */
+.enter{
+  display:flex;gap:var(--space-2xs);width:min(100%, 22rem);
+  background:oklch(from var(--surface) l c h / .92);
+  border:var(--rule-hair) solid var(--rule);
+  border-radius:var(--radius-pill);padding:.3em .3em .3em 1em;
+  box-shadow:var(--shadow-card);
+}
+.enter input{
+  flex:1 1 auto;min-width:0;border:0;background:none;color:var(--ink);
+  font-family:var(--font-outlier);font-size:var(--text-md);letter-spacing:.02em;
+}
+.enter input::placeholder{color:var(--ink-3);opacity:.7}
+.enter input:focus{outline:none}
+.enter:focus-within{border-color:var(--focus);box-shadow:0 0 0 3px oklch(from var(--focus) l c h / .22)}
+.enter button{
+  flex:0 0 auto;border:0;border-radius:var(--radius-pill);cursor:pointer;
+  background:var(--brand);color:var(--brand-ink);
+  font:700 var(--text-sm)/1 var(--font-body);padding:.72em 1.25em;
+}
+.enter button:hover{filter:brightness(.94)}
+.enter button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.enter[hidden]{display:none}
+
+.demoflag{
+  font-family:var(--font-outlier);font-size:var(--text-2xs);
+  color:var(--ink-3);letter-spacing:.04em;
+}
+
+/* ---------- 折線下方 ---------- */
+.below{max-width:var(--page-max);margin:0 auto;padding:var(--space-xl) var(--gutter) var(--space-2xl)}
+.folio{border-top:var(--rule-hair) solid var(--rule);padding-top:var(--space-md)}
+.folio h2{
+  margin:0 0 var(--space-xs);font-family:var(--font-display);font-weight:900;
+  font-size:var(--text-xl);line-height:var(--lh-tight);
+}
+.folio p{margin:0 0 var(--space-md);color:var(--ink-2);font-size:var(--text-sm)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2xs) var(--space-sm);font-size:var(--text-xs);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:.4em}
+.legend i{width:.85em;height:.85em;border-radius:2px;display:inline-block}
+.colophon{
+  margin-top:var(--space-xl);padding-top:var(--space-md);
+  border-top:var(--rule-hair) solid var(--rule);
+  font-size:var(--text-xs);color:var(--ink-3);line-height:1.75;
+}
+.colophon b{font-family:var(--font-outlier);color:var(--ink-2)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}
+}
+</style>
+</head>
+<body>
+
+<main class="stage">
+  <picture>
+    <source media="(max-width:640px)" srcset="public/assets/hero-portrait.jpg">
+    <img class="hero" src="public/assets/hero-wide.jpg"
+         alt="小小運動員站在最前方，八位世界運動選手層層堆疊在他們身後的陽光裡">
+  </picture>
+
+  <header class="top">
+    <a class="brandmark" href="#/">
+      <img src="public/assets/logo.png" alt="">
+      <b>訓練護照</b>
+    </a>
+    <button class="linkbtn" type="button">教練登入</button>
+  </header>
+
+  <div class="headline">
+    <span class="eyebrow">Youth Training Passport</span>
+    <h1>你的訓練，一塊一塊蓋起來。</h1>
+    <p>輸入教練給你的護照編號，蓋下屬於你的那個章。</p>
+  </div>
+
+  <div class="foot">
+    <button class="seal" id="seal" type="button" disabled
+            aria-describedby="hint" aria-label="長按印章開啟護照">
+      <span class="burst" aria-hidden="true">
+        <span class="flash"></span>
+        <span class="rays"></span>
+        <svg class="ribbons" viewBox="-100 -100 200 200" aria-hidden="true">
+          <!-- 一片火焰，八個角度複製。路徑只寫一次，靠 CSS rotate 排開 -->
+          <path style="rotate:0deg;   animation-delay:60ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:45deg;  animation-delay:96ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:90deg;  animation-delay:72ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:135deg; animation-delay:120ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:180deg; animation-delay:84ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:225deg; animation-delay:132ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:270deg; animation-delay:66ms"  d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+          <path style="rotate:315deg; animation-delay:108ms" d="M10 3C31-13 59-26 95-24 71-6 41 9 12 9Z"></path>
+        </svg>
+      </span>
+      <span class="ink" aria-hidden="true"></span>
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="track" cx="50" cy="50" r="47"></circle>
+        <circle class="bar"   cx="50" cy="50" r="47"></circle>
+      </svg>
+      <span class="body">
+        <img src="public/assets/stamp.png" alt="">
+        <span class="name" id="sealName"></span>
+      </span>
+      <span class="sparks" id="sparks" aria-hidden="true"></span>
+    </button>
+
+    <p class="hint" id="hint" role="status" aria-live="polite">先輸入護照編號</p>
+
+    <form class="enter" id="enter" autocomplete="off">
+      <input id="pid" inputmode="latin" autocapitalize="off" autocorrect="off"
+             spellcheck="false" placeholder="Ig9yNWU0sD23" aria-label="護照編號">
+      <button type="submit">查詢</button>
+    </form>
+    <p class="demoflag" id="demoflag" hidden></p>
+  </div>
+</main>
+
+<section class="below">
+  <div class="folio">
+    <h2>塔是怎麼蓋的？</h2>
+    <p>每堂課的時間會依「基礎動作、肌力、爆發力、增強式、速度敏捷、能量系統、活動度」七種能力分配。某一種能力累積到門檻分鐘數，就長出一塊那個顏色的方塊。一個 block（4–6 週）結束會畫一條完成線。教練看到你有突破，會額外送金、銀或彩虹方塊。</p>
+    <div class="legend">
+      <span><i style="background:var(--c-fms)"></i>基礎動作</span>
+      <span><i style="background:var(--c-strength)"></i>肌力</span>
+      <span><i style="background:var(--c-power)"></i>爆發力</span>
+      <span><i style="background:var(--c-plyo)"></i>增強式</span>
+      <span><i style="background:var(--c-saq)"></i>速度敏捷</span>
+      <span><i style="background:var(--c-energy)"></i>能量系統</span>
+      <span><i style="background:var(--c-mobility)"></i>活動度</span>
+    </div>
+  </div>
+
+  <footer class="colophon">
+    訓練護照 · Youth Training Passport　—　方塊塔以七項能力的累積分鐘數換算；門檻＝200 分鐘 × 該階段目標比重。金／銀／彩虹方塊由教練依突破頒發，不計入科學圖。<br>
+    資料由教練登錄，家長與學員為唯讀。編號請向教練索取。
+  </footer>
+</section>
+
+<script>
+(function(){
+  'use strict';
+
+  var HOLD_MS   = 1600;   // BRAND.md §5：1.6 秒，不是 3 秒
+  var SKIP_AFTER = 3;     // 第 3 次之後改成短按直接進
+
+  var seal   = document.getElementById('seal');
+  var nameEl = document.getElementById('sealName');
+  var hint   = document.getElementById('hint');
+  var form   = document.getElementById('enter');
+  var input  = document.getElementById('pid');
+  var flag   = document.getElementById('demoflag');
+
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var state  = { id:null, name:null, opens:0, holding:false, raf:0, p:0, done:false };
+
+  function setP(v){ state.p = v; seal.style.setProperty('--p', v.toFixed(4)); }
+  function say(msg, warn){ hint.textContent = msg; hint.classList.toggle('warn', !!warn); }
+
+  /* ---------- 開場：回訪就直接刻好名字 ---------- */
+  try {
+    var lastId   = localStorage.getItem('ytp-last-id');
+    var lastName = localStorage.getItem('ytp-last-name');
+    state.opens  = parseInt(localStorage.getItem('ytp-open-count') || '0', 10) || 0;
+    if (lastId && lastName) { engrave(lastId, lastName, true); }
+  } catch (e) { /* 隱私模式：當第一次來 */ }
+
+  /* ---------- 查詢編號 → 章上刻名字 ---------- */
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var id = input.value.trim();
+    if (!id) { say('先填教練給你的編號', true); input.focus(); return; }
+    say('查詢中…');
+    lookup(id);
+  });
+
+  function lookup(id){
+    fetch('/api/passport?id=' + encodeURIComponent(id))
+      .then(function(r){ if (!r.ok) throw new Error('not found'); return r.json(); })
+      .then(function(d){
+        var n = (d && d.athlete && (d.athlete.name || d.athlete.public_id)) || id;
+        engrave(id, n, false);
+      })
+      .catch(function(){
+        // 原型模式：API 沒接上時仍可展示互動。正式版這裡要顯示錯誤。
+        flag.hidden = false;
+        flag.textContent = '原型模式 · API 未連線，名字直接取用輸入值';
+        engrave(id, id, false);
+      });
+  }
+
+  function engrave(id, name, returning){
+    state.id = id; state.name = name;
+    nameEl.textContent = name;
+    seal.disabled = false;
+    seal.setAttribute('aria-label', '長按印章，開啟 ' + name + ' 的護照');
+    form.hidden = true;
+    var shortcut = state.opens >= SKIP_AFTER;
+    if (reduce)         say('輕觸印章即可進入');
+    else if (shortcut)  say('輕觸印章即可進入');
+    else if (returning) say('歡迎回來，' + name + '。按住印章 1.6 秒');
+    else                say('按住印章 1.6 秒，蓋下你的章');
+  }
+
+  /* ---------- 長按 ---------- */
+  function shortcutMode(){ return reduce || state.opens >= SKIP_AFTER; }
+
+  function start(e){
+    if (seal.disabled || state.done) return;
+    if (e && e.type === 'pointerdown' && e.button !== 0) return;
+    if (shortcutMode()) { finish(); return; }
+    if (state.holding) return;
+    state.holding = true;
+    seal.classList.remove('nudge');
+    var t0 = performance.now() - state.p * HOLD_MS;
+    cancelAnimationFrame(state.raf);
+    (function step(now){
+      if (!state.holding) return;
+      var p = Math.min(1, (now - t0) / HOLD_MS);
+      setP(p);
+      if (p >= 1) { state.holding = false; finish(); return; }
+      state.raf = requestAnimationFrame(step);
+    })(performance.now());
+  }
+
+  function release(){
+    if (!state.holding || state.done) return;
+    state.holding = false;
+    cancelAnimationFrame(state.raf);
+    if (state.p < 0.06) {                 // 幾乎等於短按
+      setP(0);
+      seal.classList.remove('nudge');
+      void seal.offsetWidth;              // 重新觸發動畫
+      seal.classList.add('nudge');
+      say('按住不放，別鬆手', true);
+      return;
+    }
+    say('差一點 —— 再按久一點', true);     // 讓「差一點」被看見
+    var from = state.p, t0 = performance.now(), dur = 260;
+    (function back(now){
+      var k = Math.min(1, (now - t0) / dur);
+      setP(from * (1 - k * k));           // ease-in 回吸
+      if (k < 1) state.raf = requestAnimationFrame(back);
+      else setP(0);
+    })(t0);
+  }
+
+  /* 呼吸法餘燼：向外飛散，略微上飄（火星不會往下掉） */
+  function emberBurst(){
+    if (reduce) return;
+    var box = document.getElementById('sparks');
+    box.textContent = '';
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 24; i++){
+      var a = (i / 24) * Math.PI * 2 + (Math.random() - .5) * .28;
+      var dist = 78 + Math.random() * 86;
+      var el = document.createElement('i');
+      el.style.setProperty('--x', (Math.cos(a) * dist).toFixed(1) + 'px');
+      el.style.setProperty('--y', (Math.sin(a) * dist - 22).toFixed(1) + 'px'); // 上飄
+      el.style.setProperty('--s', (2.5 + Math.random() * 3.5).toFixed(1) + 'px');
+      el.style.setProperty('--t', (40 + Math.random() * 190).toFixed(0) + 'ms');
+      el.style.setProperty('--dur', (720 + Math.random() * 460).toFixed(0) + 'ms');
+      frag.appendChild(el);
+    }
+    box.appendChild(frag);
+    setTimeout(function(){ box.textContent = ''; }, 1500);  // 收乾淨，不留 DOM
+  }
+
+  function finish(){
+    state.done = true;
+    setP(1);
+    seal.classList.add('done');
+    emberBurst();
+    say('已蓋章 · 開啟護照');
+    try {
+      localStorage.setItem('ytp-last-id', state.id);
+      localStorage.setItem('ytp-last-name', state.name);
+      localStorage.setItem('ytp-open-count', String(state.opens + 1));
+    } catch (e) {}
+    setTimeout(function(){
+      // 移植進 app.js 後改成：location.hash = '#/p/' + encodeURIComponent(state.id);
+      say('→ 這裡接進護照頁 #/p/' + state.id);
+    }, reduce ? 0 : 620);
+  }
+
+  seal.addEventListener('pointerdown', start);
+  seal.addEventListener('pointerup', release);
+  seal.addEventListener('pointercancel', release);
+  seal.addEventListener('pointerleave', release);
+  seal.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  // 鍵盤：Space / Enter 按住等效
+  seal.addEventListener('keydown', function(e){
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    if (e.repeat) return;
+    start(e);
+  });
+  seal.addEventListener('keyup', function(e){
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    e.preventDefault();
+    release();
+  });
+  seal.addEventListener('blur', release);
+})();
+</script>
+</body>
+</html>

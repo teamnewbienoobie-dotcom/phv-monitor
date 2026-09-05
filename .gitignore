@@ -12,3 +12,7 @@ youth-training-passport/.dev.vars
 youth-training-passport/.wrangler/
 youth-training-passport/wrangler-dev.log
 youth-training-passport/pp-tmp.json
+
+# 訓練護照：畫風比稿與主圖原始檔（~100MB 2K PNG），留在磁碟不進版控
+# 上線用的壓縮版在 public/assets/，那個要進
+youth-training-passport/style-tests/

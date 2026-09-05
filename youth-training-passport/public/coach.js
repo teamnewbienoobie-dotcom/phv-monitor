@@ -563,11 +563,11 @@ function wireAvatarPicker(root) {
 /* ===== #/coach 後台 ===== */
 async function renderCoach() {
   const app = $('#app');
-  if (!S.coach) { app.innerHTML = `<div class="topbar"><a class="brand" href="#/">訓練護照</a></div><div class="card"><h3>教練後台</h3><p class="sec">需要教練密碼。</p><button class="btn primary" id="login">登入</button></div>`; $('#login').onclick = () => askPassword(renderCoach); return; }
-  app.innerHTML = `<div class="topbar"><a class="brand" href="#/">訓練護照</a><span class="row"><span class="chip">教練模式</span><button class="btn sm ghost" id="logout">登出</button></span></div><p class="muted">載入中…</p>`;
+  if (!S.coach) { app.innerHTML = `<div class="topbar"><a class="brand" href="#/"><img src="assets/logo.png" alt="">訓練護照</a></div><div class="card"><h3>教練後台</h3><p class="sec">需要教練密碼。</p><button class="btn primary" id="login">登入</button></div>`; $('#login').onclick = () => askPassword(renderCoach); return; }
+  app.innerHTML = `<div class="topbar"><a class="brand" href="#/"><img src="assets/logo.png" alt="">訓練護照</a><span class="row"><span class="chip">教練模式</span><button class="btn sm ghost" id="logout">登出</button></span></div><p class="muted">載入中…</p>`;
   $('#logout').onclick = logout;
   const cd = await coachData(true);
-  app.innerHTML = `<div class="topbar"><a class="brand" href="#/">訓練護照</a><span class="row"><span class="chip">教練模式</span><button class="btn sm ghost" id="logout">登出</button></span></div>
+  app.innerHTML = `<div class="topbar"><a class="brand" href="#/"><img src="assets/logo.png" alt="">訓練護照</a><span class="row"><span class="chip">教練模式</span><button class="btn sm ghost" id="logout">登出</button></span></div>
     <div class="card"><div class="card-head"><div class="card-title">學員 <small>${cd.athletes.length} 位</small></div><button class="btn sm" id="anew">＋ 新學員</button></div><div id="anewform" hidden></div>
       <div class="alist">${cd.athletes.map(a => `<a class="arow" href="#/p/${encodeURIComponent(a.public_id)}">${avatarHtml(a, 'av')}
         <div><div class="nm">${esc(a.nickname)} <span class="small muted">${esc(a.public_id)}</span></div><div class="sub">${a.group_name ? esc(a.group_name) + ' · ' : ''}${STAGE_LABEL[a.stage]?.split('（')[0]} · ${a.session_count} 堂${a.last_date ? ' · 最近 ' + fmtDate(a.last_date) : ''}</div>

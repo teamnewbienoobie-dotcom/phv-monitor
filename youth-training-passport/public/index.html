@@ -46,6 +46,21 @@
   --accent-soft:   oklch(94% 0.030 286);
   --focus:         oklch(48% 0.180 286);
 
+  /* ---- landing 天空層（只服務 landing，工具頁不用）---- */
+  --sky-hi:   oklch(96.4% 0.020 174);  /* 主圖天空上緣，幾乎等同 --paper */
+  --sky:      oklch(90.7% 0.062 213);
+  --sky-deep: oklch(78.9% 0.092 239);
+  --gold-ray: oklch(93.6% 0.051 90);   /* 陽光光束 */
+  --gold-mon: oklch(84.6% 0.100 88);   /* 和柄雲紋 */
+  --navy:     oklch(27.9% 0.089 265);
+
+  /* ---- 品牌色（取樣自 標準logo.png）----
+   * ⚠️ --brand 與 --c-strength 數值上是同一個顏色（both hue 30）。
+   * --brand 永遠不當 UI 狀態色，且不與七元素同框。詳見 BRAND.md §2.4。 */
+  --brand:       oklch(54.4% 0.171 30);
+  --brand-steel: oklch(49.7% 0.077 240);
+  --brand-ink:   oklch(99.2% 0.004 165);
+
   /* ---- 七元素：solid 給圖塊與點，deep 給文字，soft 給底 ---- */
   --c-fms:           oklch(56% 0.150 258);
   --c-fms-deep:      oklch(40% 0.130 258);
@@ -140,6 +155,17 @@
     --accent-ink:    oklch(18% 0.040 286);
     --accent-soft:   oklch(30% 0.060 286);
     --focus:         oklch(78% 0.140 286);
+
+    /* ---- landing 天空層 · dark：壓暗但不翻成夜景 ---- */
+    --sky-hi:   oklch(32% 0.028 200);
+    --sky:      oklch(27% 0.045 213);
+    --sky-deep: oklch(22% 0.055 239);
+    --gold-ray: oklch(72% 0.070 90);
+    --gold-mon: oklch(60% 0.085 88);
+    --navy:     oklch(72% 0.070 265);
+    --brand:       oklch(66% 0.150 30);
+    --brand-steel: oklch(70% 0.065 240);
+    --brand-ink:   oklch(16% 0.030 30);
     --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
     --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
     --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);
@@ -171,6 +197,17 @@
   --accent-ink:    oklch(18% 0.040 286);
   --accent-soft:   oklch(30% 0.060 286);
   --focus:         oklch(78% 0.140 286);
+
+  /* ---- landing 天空層 · dark：壓暗但不翻成夜景 ---- */
+  --sky-hi:   oklch(32% 0.028 200);
+  --sky:      oklch(27% 0.045 213);
+  --sky-deep: oklch(22% 0.055 239);
+  --gold-ray: oklch(72% 0.070 90);
+  --gold-mon: oklch(60% 0.085 88);
+  --navy:     oklch(72% 0.070 265);
+  --brand:       oklch(66% 0.150 30);
+  --brand-steel: oklch(70% 0.065 240);
+  --brand-ink:   oklch(16% 0.030 30);
   --c-fms:           oklch(66% 0.135 258);  --c-fms-deep:      oklch(80% 0.100 258);  --c-fms-on:      oklch(16% 0.030 258);
   --c-strength:      oklch(64% 0.155 30);   --c-strength-deep: oklch(80% 0.110 30);   --c-strength-on: oklch(16% 0.030 30);
   --c-power:         oklch(74% 0.135 75);   --c-power-deep:    oklch(84% 0.110 75);   --c-power-on:    oklch(18% 0.035 75);
@@ -262,7 +299,10 @@ button{ font: inherit; color: inherit; }
 .brand{
   font-family: var(--font-display); font-weight: 900; font-size: var(--text-xl);
   letter-spacing: .01em; line-height: 1.1; text-decoration: none; color: var(--ink);
+  display: inline-flex; align-items: center; gap: var(--space-2xs);
 }
+/* 母品牌徽章：工具頁的 topbar 也掛，讓 landing 與內頁是同一個世界。見 BRAND.md §1 */
+.brand img{ width: 30px; height: auto; display: block; flex: none; }
 .brand:hover{ text-decoration: underline; text-decoration-thickness: 2px; }
 
 .header{
@@ -924,6 +964,325 @@ small.warn{ color: var(--warn); }
   }
   .btn:active,.tab:active,.seg button:active,.toast .tact:active{ transform: none; }
 }
+
+/* ===================== landing（首頁 #/）=====================
+ * 全部 lp- 前綴，與其他頁面完全隔離。原型見 prototype-landing.html。
+ * 設計定案與規範見 BRAND.md §4 / §5。
+ * ============================================================ */
+.page.home{ max-width: none; padding: 0; gap: 0; }
+.page.home .page-in{
+  max-width: var(--page-max); margin-inline: auto;
+  padding: var(--space-xl) var(--gutter) var(--space-3xl);
+  display: flex; flex-direction: column; gap: var(--space-lg);
+}
+/* ---------- 舞台 ---------- */
+.lp-stage{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:clamp(560px, 82svh, 780px);
+  /* 手機：主圖是八人金字塔，舞台要夠高角色才不會被壓成豆子 */
+  @media (max-width:640px){ min-height:clamp(620px, 92svh, 900px); }
+  display:grid;grid-template-rows:auto 1fr auto;
+  padding:var(--space-md) var(--gutter) var(--space-lg);
+  background:var(--sky-hi);
+}
+/* 主圖：16:9 母片，中央安全區。手機直式靠 object-position:center 保住兩個孩子 */
+/* 主圖走 art direction：手機吃直式母片、桌機吃寬式母片。
+ * 不是同一張圖裁兩次 —— 一列橫排的構圖在手機上必定掉人，
+ * 所以兩張都是「中央金字塔堆疊」的獨立構圖。見 BRAND.md §4.3。 */
+.lp-stage>picture{position:absolute;inset:0;z-index:-2;display:block}
+.lp-stage .lp-hero{
+  width:100%;height:100%;object-fit:cover;display:block;
+  object-position:center 30%;
+}
+@media (max-width:640px){
+  .lp-stage .lp-hero{object-position:center 22%}
+}
+/* 上下柔化，讓文字與印章讀得到。不是暗角，是天空的延伸 */
+.lp-stage::before,.lp-stage::after{
+  content:"";position:absolute;left:0;right:0;z-index:-1;pointer-events:none;
+}
+/* 上緣柔化偏重 —— 這是刻意的：頂層兩顆大頭像被洗淡成「背景陣容」，
+ * 視線才會落到前排的兩個孩子身上。定案於 2026-09-05。 */
+.lp-stage::before{
+  top:0;height:44%;
+  background:linear-gradient(to bottom,
+    var(--sky-hi) 0%,
+    oklch(from var(--sky-hi) l c h / .82) 42%,
+    transparent 100%);
+}
+/* 下緣淡成天空色 —— 印章因此蓋在「紙」上，而不是蓋在孩子的腿上 */
+.lp-stage::after{
+  bottom:0;height:56%;
+  background:linear-gradient(to top,
+    var(--sky-hi) 0%,
+    var(--sky-hi) 26%,
+    oklch(from var(--sky-hi) l c h / .72) 52%,
+    transparent 100%);
+}
+
+/* ---------- 頁首 ---------- */
+.lp-top{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
+.lp-brand{display:flex;align-items:center;gap:var(--space-xs);text-decoration:none;color:inherit}
+.lp-brand img{width:38px;height:auto;display:block}
+.lp-brand b{
+  font-family:var(--font-display);font-weight:900;font-size:var(--text-lg);
+  letter-spacing:.01em;line-height:1;color:var(--navy);
+}
+.lp-link{
+  font:500 var(--text-sm)/1 var(--font-body);color:var(--navy);
+  background:oklch(from var(--sky-hi) l c h / .72);
+  border:var(--rule-hair) solid oklch(from var(--navy) l c h / .28);
+  border-radius:var(--radius-pill);padding:.5em .95em;cursor:pointer;
+}
+.lp-link:hover{background:var(--sky-hi)}
+.lp-link:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ---------- 標題（壓在兩個孩子上方）---------- */
+.lp-head{
+  align-self:start;text-align:center;margin-top:var(--space-xs);
+  display:grid;gap:var(--space-2xs);justify-items:center;
+}
+.lp-eyebrow{
+  font-family:var(--font-outlier);font-size:var(--text-2xs);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--brand);
+}
+.lp-head h1{
+  margin:0;font-family:var(--font-display);font-weight:900;
+  /* 手機上收斂一級：標題吃掉的高度要還給主圖 */
+  font-size:clamp(1.6rem, 6.4vw, 3.1rem);line-height:var(--lh-display);
+  letter-spacing:-.01em;color:var(--navy);text-wrap:balance;
+  max-width:16ch;
+}
+.lp-head p{
+  margin:0;font-size:var(--text-sm);color:var(--navy);max-width:26ch;
+  /* 副標可能落在角色身上 —— 給它一點光暈保底 */
+  text-shadow:0 1px 3px oklch(from var(--sky-hi) l c h / .95),
+              0 0 12px oklch(from var(--sky-hi) l c h / .9);
+}
+
+/* ---------- 底部：印章 + 輸入 ---------- */
+.lp-foot{display:grid;justify-items:center;gap:var(--space-sm);align-self:end}
+
+/* 印章：壓在畫面下緣中央，斜壓過孩子腳邊（BRAND.md §5）*/
+.lp-seal{
+  position:relative;width:clamp(130px, 33vw, 190px);aspect-ratio:1;
+  display:grid;place-items:center;
+  background:none;border:0;padding:0;margin:0;
+  cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;
+  --p:0;                       /* 0→1 長按進度，由 JS 驅動 */
+  transform:rotate(-6deg);
+}
+.lp-seal:disabled{cursor:not-allowed}
+.lp-seal:focus-visible{outline:3px solid var(--focus);outline-offset:6px;border-radius:50%}
+
+/* 回饋 1／墨水：從章底往外滲 */
+.lp-seal .ink{
+  position:absolute;left:50%;top:56%;width:190%;aspect-ratio:1;
+  translate:-50% -50%;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    oklch(from var(--brand) l c h / .38) 0%,
+    oklch(from var(--brand) l c h / .26) 46%,
+    oklch(from var(--brand) l c h / 0) 68%);
+  scale:calc(.18 + var(--p) * .82);
+  opacity:calc(var(--p) * 1);
+  filter:blur(calc(2px + var(--p) * 5px));
+  pointer-events:none;
+}
+/* 回饋 2／章身：按住時往下壓 */
+.lp-seal .body{
+  position:relative;width:100%;height:100%;
+  display:grid;place-items:center;
+  translate:0 calc(var(--p) * 7px);
+  scale:calc(1 - var(--p) * .045);
+  filter:drop-shadow(0 calc(10px - var(--p) * 8px) calc(16px - var(--p) * 10px)
+         oklch(from var(--navy) l c h / calc(.30 - var(--p) * .16)));
+  transition:translate var(--dur-micro) var(--ease-out);
+}
+.lp-seal .body img{width:100%;height:100%;object-fit:contain;display:block}
+/* 名字刻在下緣紅帶上 */
+.lp-seal .name{
+  position:absolute;left:50%;top:73.5%;translate:-50% -50%;
+  width:52%;text-align:center;
+  font-family:var(--font-body);font-weight:700;
+  font-size:clamp(.8rem, 3.1vw, 1rem);line-height:1;
+  color:var(--brand-ink);
+  text-shadow:0 1px 2px oklch(from var(--navy) l c h / .35);
+  pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.lp-seal .name:empty::after{
+  content:"— — —";opacity:.5;letter-spacing:.2em;
+}
+/* 回饋 3／環形進度 */
+.lp-seal .ring{
+  position:absolute;inset:-7%;width:114%;height:114%;
+  transform:rotate(-90deg);pointer-events:none;overflow:visible;
+}
+.lp-seal .ring circle{fill:none;stroke-linecap:round}
+.lp-seal .ring .track{stroke:oklch(from var(--navy) l c h / .16);stroke-width:2.4}
+.lp-seal .ring .bar{
+  stroke:var(--brand);stroke-width:3.4;
+  stroke-dasharray:295.31;
+  stroke-dashoffset:calc(295.31 * (1 - var(--p)));
+}
+/* 短按彈一下 */
+@keyframes nudge{
+  0%,100%{rotate:0deg;scale:1}
+  30%{rotate:-3deg;scale:1.05}
+  62%{rotate:2.5deg;scale:.985}
+}
+.lp-seal.nudge .body{animation:nudge 380ms var(--ease-out)}
+/* 完成頓點 */
+@keyframes thud{
+  0%{scale:1}
+  22%{scale:.9}
+  100%{scale:1.03}
+}
+.lp-seal.done .body{animation:thud 340ms var(--ease-out) forwards}
+.lp-seal.done{pointer-events:none}
+
+/* ============================================================
+   呼吸法金光 — 蓋章瞬間爆發。四層：
+   ① flash 核心閃光 ② rays 放射光芒 ③ ribbons 火焰流體弧 ④ sparks 餘燼
+   顏色只走 --gold-ray / --gold-mon，不新增色票。
+   ============================================================ */
+.lp-burst{
+  position:absolute;left:50%;top:50%;width:300%;aspect-ratio:1;
+  translate:-50% -50%;pointer-events:none;
+  opacity:0;                      /* 未蓋章時完全不存在 */
+}
+.lp-seal.done .lp-burst{opacity:1}
+
+/* ① 核心閃光 */
+.lp-burst .flash{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,
+    oklch(from var(--gold-ray) l c h / .95) 0%,
+    oklch(from var(--gold-mon) l c h / .62) 20%,
+    oklch(from var(--gold-mon) l c h / .18) 40%,
+    oklch(from var(--gold-mon) l c h / 0)   62%);
+  scale:.18;opacity:0;
+}
+.lp-seal.done .flash{animation:flash 660ms var(--ease-out) forwards}
+@keyframes flash{
+  0%  {scale:.18;opacity:0}
+  13% {scale:.58;opacity:1}
+  100%{scale:1.55;opacity:0}
+}
+
+/* ② 放射光芒 */
+.lp-burst .rays{
+  position:absolute;inset:9%;border-radius:50%;
+  background:repeating-conic-gradient(from -7deg,
+    oklch(from var(--gold-ray) l c h / 0)   0deg 4.5deg,
+    oklch(from var(--gold-ray) l c h / .8)  6deg 8deg,
+    oklch(from var(--gold-ray) l c h / 0)   9.5deg 15deg);
+  filter:blur(5px);
+  -webkit-mask:radial-gradient(circle, transparent 16%, #000 32%, #000 64%, transparent 86%);
+          mask:radial-gradient(circle, transparent 16%, #000 32%, #000 64%, transparent 86%);
+  scale:.35;opacity:0;
+}
+.lp-seal.done .rays{animation:rays 820ms var(--ease-out) 40ms forwards}
+@keyframes rays{
+  0%  {scale:.35;opacity:0;   rotate:0deg}
+  18% {opacity:.95}
+  100%{scale:1.28;opacity:0;  rotate:26deg}
+}
+
+/* ③ 火焰流體弧 — 呼吸法的招牌 */
+.lp-burst .ribbons{
+  position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+}
+.lp-burst .ribbons path{
+  fill:var(--gold-ray);
+  transform-box:view-box;transform-origin:0 0;
+  scale:.22;opacity:0;
+  filter:blur(.6px);
+}
+.lp-seal.done .ribbons path{animation:rib 940ms var(--ease-out) forwards}
+@keyframes rib{
+  0%  {scale:.22;opacity:0}
+  20% {opacity:.92}
+  100%{scale:1.18;opacity:0}
+}
+
+/* ④ 餘燼 — JS 生成，每顆帶自己的角度與距離 */
+.lp-sparks{position:absolute;inset:0;pointer-events:none}
+.lp-sparks i{
+  position:absolute;left:50%;top:50%;
+  width:var(--s);height:var(--s);border-radius:50%;
+  background:var(--gold-ray);
+  box-shadow:0 0 7px 2px oklch(from var(--gold-mon) l c h / .75);
+  opacity:0;
+  animation:spark var(--dur) var(--ease-out) var(--t) forwards;
+}
+@keyframes spark{
+  0%  {opacity:0; translate:-50% -50%;                                    scale:.35}
+  14% {opacity:1}
+  100%{opacity:0; translate:calc(-50% + var(--x)) calc(-50% + var(--y));  scale:.15}
+}
+
+/* 動效敏感：只留一次柔和的金色暈開，不放粒子 */
+@media (prefers-reduced-motion:reduce){
+  .lp-burst .rays,.lp-burst .ribbons,.lp-sparks{display:none}
+  .lp-seal.done .flash{animation:none;scale:1.1;opacity:.55}
+}
+
+.lp-hint{
+  min-height:1.4em;font-size:var(--text-sm);font-weight:500;
+  color:var(--navy);text-align:center;
+  background:oklch(from var(--sky-hi) l c h / .8);
+  border-radius:var(--radius-pill);padding:.25em 1em;
+}
+.lp-hint.warn{color:var(--brand);font-weight:700}
+
+/* 編號輸入 */
+.lp-enter{
+  display:flex;gap:var(--space-2xs);width:min(100%, 22rem);
+  background:oklch(from var(--surface) l c h / .92);
+  border:var(--rule-hair) solid var(--rule);
+  border-radius:var(--radius-pill);padding:.3em .3em .3em 1em;
+  box-shadow:var(--shadow-card);
+}
+.lp-enter input{
+  flex:1 1 auto;min-width:0;border:0;background:none;color:var(--ink);
+  font-family:var(--font-outlier);font-size:var(--text-md);letter-spacing:.02em;
+}
+.lp-enter input::placeholder{color:var(--ink-3);opacity:.7}
+.lp-enter input:focus{outline:none}
+.lp-enter:focus-within{border-color:var(--focus);box-shadow:0 0 0 3px oklch(from var(--focus) l c h / .22)}
+.lp-enter button{
+  flex:0 0 auto;border:0;border-radius:var(--radius-pill);cursor:pointer;
+  background:var(--brand);color:var(--brand-ink);
+  font:700 var(--text-sm)/1 var(--font-body);padding:.72em 1.25em;
+}
+.lp-enter button:hover{filter:brightness(.94)}
+.lp-enter button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.lp-enter[hidden]{display:none}
+
+.lp-flag{
+  font-family:var(--font-outlier);font-size:var(--text-2xs);
+  color:var(--ink-3);letter-spacing:.04em;
+}
+
+/* ---------- 折線下方 ---------- */
+.lp-below{max-width:var(--page-max);margin:0 auto;padding:var(--space-xl) var(--gutter) var(--space-2xl)}
+.folio{border-top:var(--rule-hair) solid var(--rule);padding-top:var(--space-md)}
+.folio h2{
+  margin:0 0 var(--space-xs);font-family:var(--font-display);font-weight:900;
+  font-size:var(--text-xl);line-height:var(--lh-tight);
+}
+.folio p{margin:0 0 var(--space-md);color:var(--ink-2);font-size:var(--text-sm)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2xs) var(--space-sm);font-size:var(--text-xs);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:.4em}
+.legend i{width:.85em;height:.85em;border-radius:2px;display:inline-block}
+.colophon{
+  margin-top:var(--space-xl);padding-top:var(--space-md);
+  border-top:var(--rule-hair) solid var(--rule);
+  font-size:var(--text-xs);color:var(--ink-3);line-height:1.75;
+}
+.colophon b{font-family:var(--font-outlier);color:var(--ink-2)}
+
 </style>
 </head>
 <body>
