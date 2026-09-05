@@ -165,7 +165,43 @@ a 10-year-old Asian girl with a high ponytail and blunt bangs,
 white athletic tank top, navy blue shorts, white crew socks, pink running shoes
 ```
 
-> **⚠️ 角色一致性尚未解決。** 目前每次生圖臉都不一樣。定案主圖之後應該做一張**角色聖經**（三視圖 + 表情表 + 配色碼），之後所有生圖用 `references: [{type:"character"}]` 餵進去。在那之前，新素材一律從定案主圖裁切或 img2img 延伸，不要重新 text-to-image。
+### 4.2.1 角色聖經（2026-09-05 建立）
+
+存於 `character-bible/`。**生任何新素材前，先把對應的三視圖當 image reference 餵進去** ——
+不這樣做，每次生出來的臉都會是不同人。
+
+| 檔案 | 內容 |
+|---|---|
+| `男孩-三視圖.jpg` / `女孩-三視圖.jpg` | 正面／側面／背面，含頭肩腰膝對位輔助線 |
+| `男孩-表情表.jpg` / `女孩-表情表.jpg` | 9 宮格：堅定／大笑／喘／驚訝／專注／失落／驕傲／吶喊／平靜 |
+| `00-角色聖經總覽.jpg` | 四張一起看 |
+| `*.png` | 2K 原始檔，留在磁碟不進版控 |
+
+**生圖時的用法**（Magnific `images_generate`）：
+
+```
+references: [{ "type": "image", "identifier": "<三視圖的 creation id>" }]
+```
+
+本聖經本身就是用定案主圖（八人金字塔直式 A）當 reference 生的，所以臉與已上線的 landing 一致。
+
+### 4.2.2 角色配色碼
+
+實際從三視圖取樣，非目測。
+
+| 部位 | 男孩 | 女孩 |
+|---|---|---|
+| 髮 | `#343336` | `#2F302F` |
+| 膚 | `#FED7BB` | `#FFDBC3` |
+| 白背心 | `#F4F5F7` | `#F4F5F9` |
+| 深藍短褲 | `#3B4468` | `#404668` |
+| 白襪 | `#F5ECE6` | `#F5F4EF` |
+| 跑鞋 | `#404668` 深藍（同短褲色族） | 粉珊瑚系 `≈#E3A19F`※ |
+
+※ 女孩鞋色取樣落在邊緣混色帶（`#D7BBBA` 亮部 ～ `#B27D83` 暗部），容差較大，以畫面為準。
+
+**短褲的深藍 `#3B4468` 與 landing 主圖球衣的 `--navy #122554` 不同**——
+前者是角色服裝色，後者是 UI token。兩者不要互相替換。
 
 ### 4.3 Landing 主圖
 
