@@ -71,8 +71,9 @@ export async function onRequest({ request, env }) {
         `INSERT INTO exercise_catalog (category, name, segment, family, level, note, def_sets, def_reps, is_library, sort_order, use_count, video_status)
          VALUES (?,?,?,?,NULL,?,?,?,1,?,0,'pending')
          ON CONFLICT(category, name) DO UPDATE SET
-           segment=excluded.segment, note=excluded.note, def_sets=excluded.def_sets, def_reps=excluded.def_reps, is_library=1`
-      ).bind(f.category, f.name, f.segment, CUSTOM_FAMILY, f.note, f.def_sets, f.def_reps, CUSTOM_SORT).run();
+           segment=excluded.segment, family=excluded.family, note=excluded.note,
+           def_sets=excluded.def_sets, def_reps=excluded.def_reps, is_library=1`
+      ).bind(f.category, f.name, f.segment, f.family || CUSTOM_FAMILY, f.note, f.def_sets, f.def_reps, CUSTOM_SORT).run();
       return json({ ok: true });
     }
 
@@ -91,6 +92,15 @@ export async function onRequest({ request, env }) {
       }
       if (!id) return json({ error: 'id 必填' }, 400);
       const b = await request.json();
+
+      // 拖到別的群組：只改家族與板塊，其他欄位不動
+      if (b.move_to) {
+        const fam = String(b.move_to.family || '').trim().slice(0, 40) || CUSTOM_FAMILY;
+        const seg = SEGMENTS.includes(b.move_to.segment) ? b.move_to.segment : null;
+        if (seg) await env.DB.prepare('UPDATE exercise_catalog SET family=?, segment=? WHERE id=?').bind(fam, seg, id).run();
+        else await env.DB.prepare('UPDATE exercise_catalog SET family=? WHERE id=?').bind(fam, id).run();
+        return json({ ok: true });
+      }
 
       // 只動影片欄位：貼連結、採用建議、換一支、標記不需要影片
       if (b.video !== undefined || b.video_status !== undefined) {

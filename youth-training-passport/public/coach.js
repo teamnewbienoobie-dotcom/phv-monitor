@@ -592,7 +592,7 @@ async function renderCoach() {
 async function libraryPanel(host) {
   host.innerHTML = '<p class="muted">載入中…</p>';
   LIB = null;
-  const lib = await library();
+  let lib = await library();   // 就地更新（拖曳、改影片）之後會重新指派，不能是 const
   let q = ''; let scope = 'all'; const sel = new Set(); let editing = null; let onlySug = false;
   let vScope = ''; let vAuto = false; let vRunning = false; let vFilter = ''; let vWeb = false;   // 找影片的範圍、是否直接上線、是否正在接力跑
 
@@ -604,7 +604,8 @@ async function libraryPanel(host) {
     if (it.video_status === 'nomatch') return '<em class="vb">找不到</em>';
     return '';
   };
-  const view = it => `<div class="lib-item${it.video_status === 'suggested' ? ' sug' : ''}" data-id="${it.id}">
+  const view = it => `<div class="lib-item${it.video_status === 'suggested' ? ' sug' : ''}" data-id="${it.id}" data-fam="${esc(it.family || '')}" data-seg="${it.segment}">
+    <span class="l_grip" title="拖到別的群組" aria-label="拖曳">⠿</span>
     <label class="lk"><input type="checkbox" class="l_ck" ${sel.has(it.id) ? 'checked' : ''}></label>
     ${it.video ? thumbHtml(it.video, 'thumb xs') : `<i class="dot" style="background:${catColor(it.category)}" title="${CAT_LABEL[it.category]}"></i>`}
     <span class="nm">${esc(it.name)}${it.level ? `<em>L${it.level}</em>` : ''}${it.custom ? '<em class="cu">自訂</em>' : ''}${vidBadge(it)}</span>
@@ -644,12 +645,13 @@ async function libraryPanel(host) {
       <span class="small sec">已選 <b id="l_n">0</b> 個</span>
       <span class="row"><button class="btn sm" id="l_clear">取消選取</button><button class="btn sm danger" id="l_delsel">移除選取的</button></span></div>
     <div class="card-title" style="font-size:14px;margin-top:8px">＋ 直接加一個動作</div>
-    <div class="lib-row">
+    <div class="lib-row edit">
       <input id="l_new_name" placeholder="動作名稱">
       <select id="l_new_cat">${opt(CATS, 'strength', c => CAT_LABEL[c])}</select>
       <select id="l_new_seg">${opt(SEGS, 'main', s => `${SEG[s].letter} ${SEG[s].label}`)}</select>
       <input id="l_new_sets" placeholder="組" inputmode="numeric">
       <input id="l_new_reps" placeholder="次數／距離">
+      <input id="l_new_fam" placeholder="群組（留空＝自訂動作）" list="famlist">
       <button class="btn sm primary" id="l_add">加入</button>
     </div>
     <p class="small muted">記錄一堂課或存課表時，庫裡沒有的動作會自動收進「自訂動作」。</p>`;
@@ -657,6 +659,72 @@ async function libraryPanel(host) {
   const listEl = $('#l_list', host);
   const bulk = $('#l_bulk', host);
   const err = m => { const el = $('#l_err', host); el.textContent = m; el.hidden = !m; };
+
+  /* ---- 拖到別的群組 ----
+   * 用 pointer events 而不是 HTML5 drag：手機的觸控不支援 dragstart。
+   * 只有握把 ⠿ 能起拖，這樣清單本身還是可以正常捲動。 */
+  let dg = null;
+  const groupUnder = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    return el ? el.closest('.libfam') : null;
+  };
+  const clearHover = () => $$('.libfam.drop', listEl).forEach(f => f.classList.remove('drop'));
+  const endDrag = () => {
+    if (dg?.ghost) dg.ghost.remove();
+    if (dg?.item) dg.item.classList.remove('dragging');
+    clearHover();
+    dg = null;
+  };
+
+  listEl.addEventListener('pointerdown', e => {
+    const grip = e.target.closest('.l_grip');
+    if (!grip || e.button > 0) return;
+    const item = grip.closest('.lib-item');
+    if (!item) return;
+    e.preventDefault();
+    grip.setPointerCapture(e.pointerId);
+    dg = { id: Number(item.dataset.id), fam: item.dataset.fam, seg: item.dataset.seg, item, grip,
+           x0: e.clientX, y0: e.clientY, started: false, ghost: null };
+  });
+
+  listEl.addEventListener('pointermove', e => {
+    if (!dg) return;
+    if (!dg.started) {
+      if (Math.hypot(e.clientX - dg.x0, e.clientY - dg.y0) < 6) return;
+      dg.started = true;
+      dg.item.classList.add('dragging');
+      const g = document.createElement('div');
+      g.className = 'dragghost';
+      g.textContent = $('.nm', dg.item).textContent.trim();
+      document.body.appendChild(g);
+      dg.ghost = g;
+    }
+    dg.ghost.style.transform = `translate(${e.clientX + 12}px, ${e.clientY - 14}px)`;
+    clearHover();
+    const t = groupUnder(e.clientX, e.clientY);
+    if (t && !(t.dataset.fam === dg.fam && t.dataset.seg === dg.seg)) t.classList.add('drop');
+    // 拖到清單上下緣時自動捲動
+    const r = listEl.getBoundingClientRect();
+    if (e.clientY < r.top + 40) listEl.scrollTop -= 12;
+    else if (e.clientY > r.bottom - 40) listEl.scrollTop += 12;
+  });
+
+  const finish = async e => {
+    if (!dg) return;
+    const started = dg.started;
+    const t = started ? groupUnder(e.clientX, e.clientY) : null;
+    const { id, fam, seg } = dg;
+    endDrag();
+    if (!started || !t) return;
+    const toFam = t.dataset.fam, toSeg = t.dataset.seg;
+    if (toFam === fam && toSeg === seg) return;
+    try {
+      await api(`/api/exercise-catalog?id=${id}`, { method: 'PUT', body: { move_to: { family: toFam, segment: toSeg } } });
+      LIB = null; lib = await library(); draw(); drawVideoBar();
+    } catch (ex) { err(ex.message); }
+  };
+  listEl.addEventListener('pointerup', finish);
+  listEl.addEventListener('pointercancel', () => endDrag());
 
   /* ---- 示範影片：進度、批次搜尋、逐項審核 ---- */
   const vbar = $('#l_vbar', host);
@@ -733,10 +801,10 @@ async function libraryPanel(host) {
     const dupFam = {};
     for (const g of lib.library) dupFam[g.family] = (dupFam[g.family] || 0) + 1;
     listEl.innerHTML = groups.length ? groups.map(g => `
-      <details class="libfam"${q || scope !== 'all' || onlySug || vFilter ? ' open' : ''}>
+      <details class="libfam"${q || scope !== 'all' || onlySug || vFilter ? ' open' : ''} data-fam="${esc(g.family)}" data-seg="${g.segment}">
         <summary><span>${esc(g.family)}${dupFam[g.family] > 1 ? ` <span class="fseg" style="${segVars(g.segment)}">${SEG[g.segment].letter}</span>` : ''} <span class="small muted">${g.items.length}</span></span>
-          <span class="row" style="gap:6px"><button class="btn xs l_fam_ren" data-f="${esc(g.family)}" data-s="${g.segment}" title="改這一組的名稱">改名</button><button class="btn xs l_fam_sel" data-f="${esc(g.family)}">全選</button><button class="btn xs danger l_fam_del" data-f="${esc(g.family)}">移除整組</button></span></summary>
-        <div class="libitems">${g.items.map(it => (editing === it.id ? editRow(it) : view(it))).join('')}</div>
+          <span class="row" style="gap:6px"><button class="btn xs l_fam_add" data-f="${esc(g.family)}" data-s="${g.segment}" title="加一個動作到這組">＋</button><button class="btn xs l_fam_ren" data-f="${esc(g.family)}" data-s="${g.segment}" title="改這一組的名稱">改名</button><button class="btn xs l_fam_sel" data-f="${esc(g.family)}">全選</button><button class="btn xs danger l_fam_del" data-f="${esc(g.family)}">移除整組</button></span></summary>
+        <div class="libitems">${g.items.map(it => { const x = { ...it, family: g.family }; return editing === it.id ? editRow(x) : view(x); }).join('')}</div>
       </details>`).join('') : '<p class="sec">沒有符合的動作。</p>';
     // 家族名稱建議清單，改名與逐項編輯共用
     const famList = [...new Set(lib.library.map(g => g.family))].sort();
@@ -754,6 +822,17 @@ async function libraryPanel(host) {
       const id = Number(ck.closest('.lib-item').dataset.id);
       ck.checked ? sel.add(id) : sel.delete(id);
       refreshBulk();
+    });
+    // 直接加一個動作到這一組：帶好群組與板塊，捲到下面的新增列讓他填名稱
+    $$('.l_fam_add', host).forEach(b => b.onclick = e => {
+      e.preventDefault();
+      $('#l_new_fam', host).value = b.dataset.f;
+      $('#l_new_seg', host).value = b.dataset.s;
+      const first = lib.library.find(g => g.family === b.dataset.f && g.segment === b.dataset.s)?.items[0];
+      if (first) $('#l_new_cat', host).value = first.category;   // 同組通常同分類
+      const nameEl = $('#l_new_name', host);
+      nameEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      nameEl.focus({ preventScroll: true });
     });
     $$('.l_fam_ren', host).forEach(b => b.onclick = async e => {
       e.preventDefault();
@@ -863,6 +942,7 @@ async function libraryPanel(host) {
       try {
         await api('/api/exercise-catalog', { method: 'POST', body: {
           name, category: $('#l_new_cat', host).value, segment: $('#l_new_seg', host).value,
+          family: $('#l_new_fam', host).value,
           sets: $('#l_new_sets', host).value, reps: $('#l_new_reps', host).value } });
         libraryPanel(host);
       } catch (ex) { err(ex.message); }
