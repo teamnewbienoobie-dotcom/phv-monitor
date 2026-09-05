@@ -571,6 +571,30 @@ input::placeholder,textarea::placeholder{ color: var(--ink-3); }
 }
 .sgrp-body.empty{ padding-block: var(--space-xs); color: var(--ink-3); font-size: var(--text-xs); }
 
+/* ---- 板塊折疊：一堂課可能記到 26 個動作，預設只露前 3 個 ---- */
+button.sgrp-head{
+  width: 100%; background: none; border: 0; color: inherit; font: inherit;
+  text-align: start; cursor: pointer;
+  padding: var(--space-2xs) 0; border-radius: var(--radius-sm);
+}
+button.sgrp-head:hover .t{ text-decoration: underline; text-underline-offset: 3px; }
+button.sgrp-head:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+.sgrp-head .chev{
+  flex: none; color: var(--ink-3); font-size: var(--text-sm); line-height: 1;
+  transition: rotate var(--dur-micro) var(--ease-out);
+}
+.sgrp[data-open="true"] .chev{ rotate: 180deg; }
+.sgrp[data-open="false"] .erow.more{ display: none; }
+.sgrp-head .chip.n{ color: var(--ink-3); }
+.sgrp-more{
+  align-self: flex-start; margin-block-start: var(--space-xs);
+  background: none; border: 0; padding: var(--space-3xs) 0; cursor: pointer;
+  font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs);
+  color: var(--accent);
+}
+.sgrp-more:hover{ text-decoration: underline; text-underline-offset: 3px; }
+.sgrp-more:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+
 .erow{ display: flex; align-items: baseline; gap: var(--space-xs); padding-block: var(--space-xs);
        border-block-start: var(--rule-hair) solid var(--rule-soft); min-width: 0; }
 .erow:first-child{ border-block-start: 0; }

@@ -709,17 +709,41 @@ function viewDist(body, pp) {
 
 /* ===== 紀錄 ===== */
 /** 一個板塊的唯讀卡：A 徽章 + 色軌 + 動作列 */
+/* 折疊時露出幾個動作。一堂課可能記到 26 個動作，全展開整頁滑不完。
+ * 3 個以內不折疊 —— 那樣的折疊鈕只是噪音。 */
+const SEG_PEEK = 3;
+let segUid = 0;
+
 function segGroup(key, exs, opt = {}) {
   const m = SEG[key];
-  const rows = exs.map(e => `<div class="erow ${e.from_plan ? '' : 'adhoc'}">
+  const foldable = exs.length > SEG_PEEK;
+  const id = `sg${++segUid}`;
+  const rows = exs.map((e, i) => `<div class="erow ${e.from_plan ? '' : 'adhoc'}${foldable && i >= SEG_PEEK ? ' more' : ''}">
       ${e.video ? thumbHtml(e.video, 'thumb xs') : `<i class="dot" style="background:${catColor(e.category)}" title="${CAT_LABEL[e.category] || ''}"></i>`}
       <span class="nm">${esc(e.name)}${e.target_movement ? ` <em>${esc(e.target_movement)}</em>` : ''}</span>
       <span class="ds">${esc(doseText(e))}</span></div>`).join('');
-  return `<section class="sgrp" style="${segVars(key)}">
-    <div class="sgrp-head"><span class="badge">${m.letter}</span><span class="t">${m.label}</span><span class="zh">${m.zh}</span>
-      <span class="sp"></span>${opt.right || (opt.mins != null ? `<span class="chip">${opt.mins} 分</span>` : '')}</div>
-    <div class="sgrp-body${rows ? '' : ' empty'}">${rows || (opt.emptyText || '這個板塊沒有排動作')}</div>
+  const meta = `<span class="t">${m.label}</span><span class="zh">${m.zh}</span><span class="sp"></span>` +
+    `${foldable ? `<span class="chip n">${exs.length} 個</span>` : ''}` +
+    `${opt.right || (opt.mins != null ? `<span class="chip">${opt.mins} 分</span>` : '')}`;
+  const head = foldable
+    ? `<button type="button" class="sgrp-head fold" aria-expanded="false" aria-controls="${id}">
+         <span class="badge">${m.letter}</span>${meta}<span class="chev" aria-hidden="true">▾</span></button>`
+    : `<div class="sgrp-head"><span class="badge">${m.letter}</span>${meta}</div>`;
+  return `<section class="sgrp${foldable ? ' foldable' : ''}"${foldable ? ' data-open="false"' : ''} style="${segVars(key)}">
+    ${head}
+    <div class="sgrp-body${rows ? '' : ' empty'}" id="${id}">${rows || (opt.emptyText || '這個板塊沒有排動作')}${
+      foldable ? `<button type="button" class="sgrp-more">還有 ${exs.length - SEG_PEEK} 個動作</button>` : ''}</div>
   </section>`;
+}
+
+/** 折疊／展開一個板塊。標題與「還有 N 個」都能觸發。 */
+function toggleSegGroup(grp) {
+  const open = grp.dataset.open !== 'true';
+  grp.dataset.open = String(open);
+  const head = $('.sgrp-head.fold', grp);
+  if (head) head.setAttribute('aria-expanded', String(open));
+  const more = $('.sgrp-more', grp);
+  if (more) more.textContent = open ? '收起' : `還有 ${$$('.erow.more', grp).length} 個動作`;
 }
 
 function sessionCard(s, coach) {
@@ -747,6 +771,10 @@ function viewLog(body, pp) {
     ${pp.session_count > pp.sessions.length ? `<p class="small muted">只顯示最近 ${pp.sessions.length} 堂（共 ${pp.session_count} 堂）。</p>` : ''}
     <p class="small muted">A–E＝一堂課的五個板塊。＋ 記號＝計畫外加練的動作。色條＝這堂課七種能力的分鐘分配。有縮圖的動作點一下可以看示範。</p></div>`;
   wireThumbs(body);
+  body.addEventListener('click', e => {
+    const t = e.target.closest('.sgrp-head.fold, .sgrp-more');
+    if (t) toggleSegGroup(t.closest('.sgrp'));
+  });
   $$('[data-del]', body).forEach(b => b.onclick = () => {
     const row = b.closest('.sess'); if (!row) return;
     const id = b.dataset.del;
