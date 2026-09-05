@@ -622,6 +622,7 @@ async function libraryPanel(host) {
     <select class="l_seg">${opt(SEGS, it.segment, s => `${SEG[s].letter} ${SEG[s].label}`)}</select>
     <input class="l_sets" value="${esc(it.sets ?? '')}" placeholder="組" inputmode="numeric">
     <input class="l_reps" value="${esc(it.reps || '')}" placeholder="次數／距離">
+    <input class="l_fam" value="${esc(it.family || '')}" placeholder="群組名稱" list="famlist">
     <span class="row" style="gap:4px"><button class="btn xs primary l_save">存</button><button class="btn xs l_cancel">取消</button></span></div>`;
 
   const total = allItems().length;
@@ -728,12 +729,18 @@ async function libraryPanel(host) {
           || (vFilter === it.video_status))) }))
       .filter(g => g.items.length);
 
+    // 同一個家族名可能跨好幾個板塊（自訂動作最常見），標上板塊才分得出誰是誰
+    const dupFam = {};
+    for (const g of lib.library) dupFam[g.family] = (dupFam[g.family] || 0) + 1;
     listEl.innerHTML = groups.length ? groups.map(g => `
       <details class="libfam"${q || scope !== 'all' || onlySug || vFilter ? ' open' : ''}>
-        <summary><span>${esc(g.family)} <span class="small muted">${g.items.length}</span></span>
-          <span class="row" style="gap:6px"><button class="btn xs l_fam_sel" data-f="${esc(g.family)}">全選</button><button class="btn xs danger l_fam_del" data-f="${esc(g.family)}">移除整組</button></span></summary>
+        <summary><span>${esc(g.family)}${dupFam[g.family] > 1 ? ` <span class="fseg" style="${segVars(g.segment)}">${SEG[g.segment].letter}</span>` : ''} <span class="small muted">${g.items.length}</span></span>
+          <span class="row" style="gap:6px"><button class="btn xs l_fam_ren" data-f="${esc(g.family)}" data-s="${g.segment}" title="改這一組的名稱">改名</button><button class="btn xs l_fam_sel" data-f="${esc(g.family)}">全選</button><button class="btn xs danger l_fam_del" data-f="${esc(g.family)}">移除整組</button></span></summary>
         <div class="libitems">${g.items.map(it => (editing === it.id ? editRow(it) : view(it))).join('')}</div>
       </details>`).join('') : '<p class="sec">沒有符合的動作。</p>';
+    // 家族名稱建議清單，改名與逐項編輯共用
+    const famList = [...new Set(lib.library.map(g => g.family))].sort();
+    listEl.insertAdjacentHTML('beforeend', `<datalist id="famlist">${famList.map(f => `<option value="${esc(f)}">`).join('')}</datalist>`);
 
     const refreshBulk = () => {
       bulk.hidden = !sel.size;
@@ -747,6 +754,17 @@ async function libraryPanel(host) {
       const id = Number(ck.closest('.lib-item').dataset.id);
       ck.checked ? sel.add(id) : sel.delete(id);
       refreshBulk();
+    });
+    $$('.l_fam_ren', host).forEach(b => b.onclick = async e => {
+      e.preventDefault();
+      const oldFam = b.dataset.f; const seg = b.dataset.s;
+      const nf = prompt(`把「${oldFam}」這一組（${SEG[seg].letter} ${SEG[seg].label}）改成什麼名稱？`, oldFam);
+      if (!nf || !nf.trim() || nf.trim() === oldFam) return;
+      try {
+        const r = await api(`/api/exercise-catalog?family=${encodeURIComponent(oldFam)}&segment=${seg}`, { method: 'PUT', body: { family: nf.trim() } });
+        toast(`已改名，${r.renamed} 個動作`);
+        LIB = null; libraryPanel(host);
+      } catch (ex) { err(ex.message); }
     });
     $$('.l_fam_sel', host).forEach(b => b.onclick = e => {
       e.preventDefault();
@@ -817,7 +835,7 @@ async function libraryPanel(host) {
       try {
         await api(`/api/exercise-catalog?id=${r.dataset.id}`, { method: 'PUT', body: {
           name: $('.l_name', r).value, category: $('.l_cat', r).value, segment: $('.l_seg', r).value,
-          sets: $('.l_sets', r).value, reps: $('.l_reps', r).value } });
+          family: $('.l_fam', r).value, sets: $('.l_sets', r).value, reps: $('.l_reps', r).value } });
         editing = null; libraryPanel(host);
       } catch (ex) { err(ex.message); }
     });

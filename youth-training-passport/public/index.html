@@ -839,11 +839,17 @@ small.warn{ color: var(--warn); }
   .lib-item .vsug{ grid-area: auto; grid-column: 1 / -1; }
 }
 .lib-row.edit{ padding-block: var(--space-xs); border-block-start: var(--rule-hair) solid var(--rule-soft); }
+/* 家族名稱同名跨板塊時，標題右邊補一個板塊字母 */
+.libfam .fseg{ display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
+               border-radius: 5px; background: var(--seg, var(--accent)); color: var(--seg-ink, var(--accent-ink));
+               font-family: var(--font-display); font-weight: 900; font-size: var(--text-xs); vertical-align: -3px; }
 .lib-list{ display: flex; flex-direction: column; gap: var(--space-2xs); }
 .lib-row{ display: grid; grid-template-columns: minmax(0,1.6fr) 6rem 8rem 2.875rem minmax(0,1fr) auto;
           gap: var(--space-2xs); align-items: center; }
 .lib-row input, .lib-row select{ padding: var(--space-2xs) var(--space-xs); font-size: var(--text-sm); width: 100%; min-height: 36px; }
 .lib-row .l_sets{ text-align: center; }
+/* 編輯列比新增列多一欄「群組名稱」 */
+.lib-row.edit{ grid-template-columns: minmax(0,1.4fr) 5.5rem 7.5rem 2.875rem minmax(0,1fr) minmax(0,1fr) auto; }
 @media (max-width: 40rem){
   .lib-row{ grid-template-columns: minmax(0,1fr) 2.875rem minmax(0,1fr) auto;
             grid-template-areas: "nm nm nm act" "cat cat seg seg" "sets reps reps reps"; }
@@ -853,6 +859,9 @@ small.warn{ color: var(--warn); }
   .lib-row > :nth-child(4){ grid-area: sets; }
   .lib-row > :nth-child(5){ grid-area: reps; }
   .lib-row > :nth-child(6){ grid-area: act; }
+  .lib-row.edit{ grid-template-areas: "nm nm nm act" "cat cat seg seg" "sets reps reps reps" "fam fam fam fam"; }
+  .lib-row.edit > :nth-child(6){ grid-area: fam; }
+  .lib-row.edit > :nth-child(7){ grid-area: act; }
 }
 
 /* ===================== toast — 只給失敗與可復原 ===================== */

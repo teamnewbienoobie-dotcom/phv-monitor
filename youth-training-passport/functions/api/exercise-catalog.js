@@ -14,6 +14,7 @@ function fields(b) {
     name,
     category: CATEGORIES.includes(b.category) ? b.category : 'strength',
     segment: SEGMENTS.includes(b.segment) ? b.segment : 'main',
+    family: String(b.family || '').trim().slice(0, 40),
     note: String(b.note || '').slice(0, 200),
     def_sets: b.sets != null && b.sets !== '' ? Math.max(1, parseInt(b.sets, 10) || 1) : null,
     def_reps: String(b.reps || '').slice(0, 60),
@@ -76,6 +77,18 @@ export async function onRequest({ request, env }) {
     }
 
     if (request.method === 'PUT') {
+      // 整組改名：?family=<舊名>&segment=<板塊> body {family:<新名>}
+      const oldFam = url.searchParams.get('family');
+      if (oldFam) {
+        const seg = url.searchParams.get('segment');
+        const b0 = await request.json();
+        const nf = String(b0.family || '').trim().slice(0, 40);
+        if (!nf) return json({ error: '新的家族名稱必填' }, 400);
+        const r = seg && SEGMENTS.includes(seg)
+          ? await env.DB.prepare('UPDATE exercise_catalog SET family=? WHERE family=? AND segment=?').bind(nf, oldFam, seg).run()
+          : await env.DB.prepare('UPDATE exercise_catalog SET family=? WHERE family=?').bind(nf, oldFam).run();
+        return json({ ok: true, renamed: r.meta.changes });
+      }
       if (!id) return json({ error: 'id 必填' }, 400);
       const b = await request.json();
 
@@ -103,9 +116,15 @@ export async function onRequest({ request, env }) {
 
       const f = fields(b);
       if (!f.name) return json({ error: '動作名稱必填' }, 400);
-      await env.DB.prepare(
-        'UPDATE exercise_catalog SET name=?, category=?, segment=?, note=?, def_sets=?, def_reps=? WHERE id=?'
-      ).bind(f.name, f.category, f.segment, f.note, f.def_sets, f.def_reps, id).run();
+      if (b.family !== undefined) {
+        await env.DB.prepare(
+          'UPDATE exercise_catalog SET name=?, category=?, segment=?, family=?, note=?, def_sets=?, def_reps=? WHERE id=?'
+        ).bind(f.name, f.category, f.segment, f.family || CUSTOM_FAMILY, f.note, f.def_sets, f.def_reps, id).run();
+      } else {
+        await env.DB.prepare(
+          'UPDATE exercise_catalog SET name=?, category=?, segment=?, note=?, def_sets=?, def_reps=? WHERE id=?'
+        ).bind(f.name, f.category, f.segment, f.note, f.def_sets, f.def_reps, id).run();
+      }
       return json({ ok: true });
     }
 
