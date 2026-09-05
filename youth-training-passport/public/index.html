@@ -571,7 +571,7 @@ input::placeholder,textarea::placeholder{ color: var(--ink-3); }
 }
 .sgrp-body.empty{ padding-block: var(--space-xs); color: var(--ink-3); font-size: var(--text-xs); }
 
-/* ---- 板塊折疊：一堂課可能記到 26 個動作，預設只露前 3 個 ---- */
+/* ---- 板塊折疊：預設完全收合，只留標題列 ---- */
 button.sgrp-head{
   width: 100%; background: none; border: 0; color: inherit; font: inherit;
   text-align: start; cursor: pointer;
@@ -584,7 +584,7 @@ button.sgrp-head:focus-visible{ outline: 2px solid var(--focus); outline-offset:
   transition: rotate var(--dur-micro) var(--ease-out);
 }
 .sgrp[data-open="true"] .chev{ rotate: 180deg; }
-.sgrp[data-open="false"] .erow.more{ display: none; }
+.sgrp[data-open="false"] .sgrp-body{ display: none; }
 .sgrp-head .chip.n{ color: var(--ink-3); }
 .sgrp-more{
   align-self: flex-start; margin-block-start: var(--space-xs);
