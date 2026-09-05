@@ -267,7 +267,6 @@ function renderHome() {
             <circle class="bar"   cx="50" cy="50" r="47"></circle>
           </svg>
           <span class="body">
-            <img src="assets/stamp.png" alt="">
             <span class="name" id="sealName">${returning ? esc(lastName) : ''}</span>
           </span>
           <span class="sparks" id="sparks" aria-hidden="true"></span>
@@ -426,6 +425,9 @@ function wireLanding(init) {
     setTimeout(() => { location.hash = `#/p/${encodeURIComponent(st.id)}`; }, reduce ? 0 : 620);
   }
 
+  // 第三層：iOS 還是可能在長按時想跳選單，touchstart 擋掉預設行為。
+  // passive:false 才擋得住；pointer 事件不受影響，長按邏輯照跑。
+  seal.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   seal.addEventListener('pointerdown', start);
   seal.addEventListener('pointerup', release);
   seal.addEventListener('pointercancel', release);

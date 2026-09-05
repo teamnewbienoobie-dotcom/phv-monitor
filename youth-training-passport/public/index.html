@@ -1115,7 +1115,10 @@ small.warn{ color: var(--warn); }
 }
 /* 回饋 2／章身：按住時往下壓 */
 .lp-seal .body{
-  position:relative;width:100%;height:100%;
+  /* 拿掉 <img> 之後 .body 是唯一的 grid item，row 高度由它決定，
+   * 而 height:100% 又回頭參照 row —— 循環，結果塌成內容高。
+   * 絕對定位切斷這個循環：直接貼滿 .lp-seal（它是 position:relative）。 */
+  position:absolute;inset:0;
   display:grid;place-items:center;
   translate:0 calc(var(--p) * 7px);
   scale:calc(1 - var(--p) * .045);
@@ -1123,7 +1126,18 @@ small.warn{ color: var(--warn); }
          oklch(from var(--navy) l c h / calc(.30 - var(--p) * .16)));
   transition:translate var(--dur-micro) var(--ease-out);
 }
-.lp-seal .body img{width:100%;height:100%;object-fit:contain;display:block}
+/* 章面用 background-image，不用 <img>。
+ * iOS 的長按選單（分享／儲存到照片／拷貝主體）是針對 <img> 元素觸發的，
+ * 約 500ms 就跳出來 —— 比任何堪用的長按時間都短，縮秒數救不了。
+ * 沒有 img 就沒有觸發對象。drop-shadow 對背景圖一樣跟著 PNG 透明度走。 */
+.lp-seal .body{ background: url("assets/stamp.png") center / contain no-repeat; }
+
+/* 第二層：關掉 callout 與選取，連同所有子元素 */
+.lp-seal, .lp-seal *{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-user-drag: none;
+}
 /* 名字刻在下緣紅帶上 */
 .lp-seal .name{
   position:absolute;left:50%;top:73.5%;translate:-50% -50%;

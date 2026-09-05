@@ -138,7 +138,10 @@ body{
 }
 /* 回饋 2／章身：按住時往下壓 */
 .seal .body{
-  position:relative;width:100%;height:100%;
+  /* 拿掉 <img> 之後 .body 是唯一的 grid item，row 高度由它決定，
+   * 而 height:100% 又回頭參照 row —— 循環，結果塌成內容高。
+   * 絕對定位切斷這個循環：直接貼滿 .lp-seal（它是 position:relative）。 */
+  position:absolute;inset:0;
   display:grid;place-items:center;
   translate:0 calc(var(--p) * 7px);
   scale:calc(1 - var(--p) * .045);
@@ -146,7 +149,12 @@ body{
          oklch(from var(--navy) l c h / calc(.30 - var(--p) * .16)));
   transition:translate var(--dur-micro) var(--ease-out);
 }
-.seal .body img{width:100%;height:100%;object-fit:contain;display:block}
+.seal .body{ background: url("public/assets/stamp.png") center / contain no-repeat; }
+.seal, .seal *{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-user-drag: none;
+}
 /* 名字刻在下緣紅帶上 */
 .seal .name{
   position:absolute;left:50%;top:73.5%;translate:-50% -50%;
@@ -382,7 +390,6 @@ body{
         <circle class="bar"   cx="50" cy="50" r="47"></circle>
       </svg>
       <span class="body">
-        <img src="public/assets/stamp.png" alt="">
         <span class="name" id="sealName"></span>
       </span>
       <span class="sparks" id="sparks" aria-hidden="true"></span>
@@ -566,6 +573,7 @@ body{
     }, reduce ? 0 : 620);
   }
 
+  seal.addEventListener('touchstart', function(e){ e.preventDefault(); }, { passive: false });
   seal.addEventListener('pointerdown', start);
   seal.addEventListener('pointerup', release);
   seal.addEventListener('pointercancel', release);
